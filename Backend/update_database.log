@@ -1,0 +1,41 @@
+2025-03-24 18:54:56,699 - __main__ - INFO - Starting database update process
+2025-03-24 18:54:56,699 - __main__ - INFO - Performing incremental update for past 30 days...
+2025-03-24 18:54:56,700 - __main__ - INFO - Fetching data from the NYC API for the past 30 days...
+2025-03-24 18:54:56,740 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): data.cityofnewyork.us:443
+2025-03-24 18:54:57,042 - urllib3.connectionpool - DEBUG - https://data.cityofnewyork.us:443 "GET /resource/43nn-pn8j.json?$limit=50000&$offset=0&$where=inspection_date%20between%20'2025-02-22'%20and%20'2025-03-24' HTTP/11" 200 None
+2025-03-24 18:54:57,520 - __main__ - INFO - Fetched 8029 records, total: 8029
+2025-03-24 18:54:57,524 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): data.cityofnewyork.us:443
+2025-03-24 18:54:57,781 - urllib3.connectionpool - DEBUG - https://data.cityofnewyork.us:443 "GET /resource/43nn-pn8j.json?$limit=50000&$offset=50000&$where=inspection_date%20between%20'2025-02-22'%20and%20'2025-03-24' HTTP/11" 200 None
+2025-03-24 18:54:57,783 - __main__ - INFO - No more data to fetch
+2025-03-24 18:54:57,784 - __main__ - INFO - Total records fetched: 8029
+2025-03-24 18:54:57,784 - __main__ - INFO - Updating database with fetched data...
+2025-03-24 18:54:57,920 - db_manager - INFO - Database connection pool initialized successfully
+2025-03-24 18:55:03,313 - __main__ - INFO - Database update complete. Restaurants: 8029, Violations: 7996, Errors: 0
+2025-03-24 18:55:03,313 - __main__ - INFO - Update complete: 8029 restaurants and 7996 violations processed
+2025-03-24 18:55:03,313 - __main__ - INFO - Database update process completed
+2025-03-24 18:56:30,307 - __main__ - INFO - Starting database update process
+2025-03-24 18:56:30,309 - __main__ - INFO - Performing incremental update for past 30 days...
+2025-03-24 18:56:30,309 - __main__ - INFO - Fetching data from the NYC API for the past 30 days...
+2025-03-24 18:56:31,929 - __main__ - INFO - Fetched 8029 records, total: 8029
+2025-03-24 18:56:32,194 - __main__ - INFO - No more data to fetch
+2025-03-24 18:56:32,194 - __main__ - INFO - Total records fetched: 8029
+2025-03-24 18:56:32,195 - __main__ - INFO - Updating database with fetched data...
+2025-03-24 18:56:32,262 - db_manager - INFO - Database connection pool initialized successfully
+2025-03-24 18:56:37,727 - __main__ - INFO - Database update complete. Restaurants: 8029, Violations: 7996, Errors: 0
+2025-03-24 18:56:37,727 - __main__ - INFO - Update complete: 8029 restaurants and 7996 violations processed
+2025-03-24 18:56:37,727 - __main__ - INFO - Database update process completed
+2025-03-25 11:37:14,131 - __main__ - INFO - Starting database update process
+2025-03-25 11:37:14,134 - __main__ - INFO - Performing incremental update for past 30 days...
+2025-03-25 11:37:14,134 - __main__ - INFO - Fetching data from the NYC API for the past 30 days...
+2025-03-25 11:37:14,250 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): data.cityofnewyork.us:443
+2025-03-25 11:37:15,495 - urllib3.connectionpool - DEBUG - https://data.cityofnewyork.us:443 "GET /resource/43nn-pn8j.json?$limit=50000&$offset=0&$where=inspection_date%20between%20'2025-02-23'%20and%20'2025-03-25' HTTP/11" 200 None
+2025-03-25 11:37:17,702 - __main__ - INFO - Fetched 8025 records, total: 8025
+2025-03-25 11:37:17,706 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): data.cityofnewyork.us:443
+2025-03-25 11:37:19,315 - urllib3.connectionpool - DEBUG - https://data.cityofnewyork.us:443 "GET /resource/43nn-pn8j.json?$limit=50000&$offset=50000&$where=inspection_date%20between%20'2025-02-23'%20and%20'2025-03-25' HTTP/11" 200 None
+2025-03-25 11:37:19,318 - __main__ - INFO - No more data to fetch
+2025-03-25 11:37:19,318 - __main__ - INFO - Total records fetched: 8025
+2025-03-25 11:37:19,318 - __main__ - INFO - Updating database with fetched data...
+2025-03-25 11:37:19,657 - db_manager - INFO - Database connection pool initialized successfully
+2025-03-25 11:37:28,760 - __main__ - INFO - Database update complete. Restaurants: 8025, Violations: 7992, Errors: 0
+2025-03-25 11:37:28,761 - __main__ - INFO - Update complete: 8025 restaurants and 7992 violations processed
+2025-03-25 11:37:28,761 - __main__ - INFO - Database update process completed

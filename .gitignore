@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+*.xcuserdatad/
+
+# Swift Package Manager
+/.build/
+/Packages/
+Package.resolved
+*.xcworkspace
+
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
