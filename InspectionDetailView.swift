@@ -87,13 +87,18 @@ struct InspectionDetailView: View {
      // Section to display when no violations are found
      private var noViolationsSection: some View {
          VStack(alignment: .leading, spacing: 10) {
-             Text("Violations")
-                 .font(.system(size: 16, weight: .semibold, design: .rounded))
-                 .padding(.bottom, 4)
+             Image(systemName: "checkmark.circle.fill")
+                         .font(.largeTitle)
+                         .foregroundColor(.green)
+                         .padding(.bottom, 4)
 
-             Text("No violations were listed for this inspection.")
-                 .font(.system(size: 14, weight: .regular, design: .rounded))
-                 .foregroundColor(.secondary)
+                     Text("No Violations Found")
+                         .font(.system(size: 16, weight: .semibold, design: .rounded))
+
+                     Text("This inspection did not result in any violations.")
+                         .font(.system(size: 14, weight: .regular, design: .rounded))
+                         .foregroundColor(.secondary)
+                         .multilineTextAlignment(.center)
          }
          .padding()
          .frame(maxWidth: .infinity, alignment: .leading)

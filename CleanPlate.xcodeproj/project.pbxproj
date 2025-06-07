@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		326C9E872DC6A6EB007457E4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 326C9E862DC6A6EB007457E4 /* FirebaseCrashlytics */; };
+		32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */; };
 		32C138BB2D8F66CF006F4121 /* NYCFoodRatingsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */; };
 		32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138B82D8F66CF006F4121 /* MainTabView.swift */; };
 		32C138C92D8F67E2006F4121 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C72D8F67E2006F4121 /* SearchViewModel.swift */; };
@@ -49,6 +50,7 @@
 
 /* Begin PBXFileReference section */
 		329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
 		32C138B82D8F66CF006F4121 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NYCFoodRatingsApp.swift; sourceTree = "<group>"; };
 		32C138BE2D8F671B006F4121 /* CleanPlate-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CleanPlate-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 				32C138C02D8F67E2006F4121 /* APIService.swift */,
 				32C138C22D8F67E2006F4121 /* FAQView.swift */,
 				32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */,
+				32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */,
 				32C138D32D905217006F4121 /* ViolationsView.swift */,
 				32C138C42D8F67E2006F4121 /* Models.swift */,
 				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
@@ -320,6 +323,7 @@
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
 				32C138D42D905217006F4121 /* ViolationsView.swift in Sources */,
 				32C138CC2D8F67E2006F4121 /* APIService.swift in Sources */,
+				32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */,
 				32C138CD2D8F67E2006F4121 /* InspectionDetailView.swift in Sources */,
 				32C138CE2D8F67E2006F4121 /* SearchView.swift in Sources */,
 				32C138CF2D8F67E2006F4121 /* Models.swift in Sources */,
@@ -489,7 +493,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -507,7 +511,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -527,7 +531,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -545,7 +549,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

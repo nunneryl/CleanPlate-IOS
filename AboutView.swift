@@ -35,7 +35,8 @@ struct AboutView: View {
                             .padding(.vertical, 8) // Padding inside disclosure
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    // .padding(.vertical, 4) // Padding for the row itself
+                    
+                    .padding(.vertical, 4)
 
                     DisclosureGroup("What should I do if I suspect a food safety issue?") {
                         VStack(alignment: .leading, spacing: 12) {
@@ -51,7 +52,7 @@ struct AboutView: View {
                         }
                         .padding(.vertical, 8) // Padding inside disclosure
                     }
-                   // .padding(.vertical, 4)
+                    .padding(.vertical, 4)
                 }
 
                 // Technical Information Section
@@ -72,14 +73,15 @@ struct AboutView: View {
 
                 // Feedback Section (Updated Email)
                 Section(header: Text("Feedback & Support")) {
-                    // Consider making this a tappable mailto link
-                    Text("We value your input! If you have any questions, suggestions, or concerns about the app, please reach out to us at cleanplateapp@aol.com. Your feedback helps us improve the experience for everyone.")
-                     .padding(.vertical, 4) // Add padding
-                     .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 8) {
+                            Text("We value your input! If you have any questions, suggestions, or concerns about the app, please reach out to us. Your feedback helps us improve the experience for everyone.")
+                                .fixedSize(horizontal: false, vertical: true)
 
-                    // OR make it a link directly:
-                    // Link("Email us at cleanplateapp@aol.com", destination: URL(string: "mailto:cleanplateapp@aol.com")!)
-                    //    .padding(.vertical, 4)
+                            // This makes the email address a tappable link that opens the Mail app.
+                            Link("Email: cleanplateapp@aol.com", destination: URL(string: "mailto:cleanplateapp@aol.com")!)
+                                .foregroundColor(.blue)
+                        }
+                        .padding(.vertical, 4)
                 }
 
                 // Legal Section (Link Added/Updated)

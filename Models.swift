@@ -1,8 +1,11 @@
+// MARK: - FULLY UPDATED AND CORRECTED FILE: Models.swift
+
 import Foundation
 
 // MARK: - Restaurant Model
-
-struct Restaurant: Identifiable, Codable {
+// This struct remains the same, but will now correctly conform to Equatable
+// because the Inspection struct below is now also Equatable.
+struct Restaurant: Identifiable, Codable, Equatable {
     // MARK: - Properties
     
     var id: String { camis ?? UUID().uuidString }
@@ -53,10 +56,12 @@ struct Restaurant: Identifiable, Codable {
 
 // MARK: - Inspection Model
 
-struct Inspection: Identifiable, Codable {
+// ##### THIS IS THE CORRECTED LINE #####
+// Added `, Equatable` to allow this struct to be compared.
+struct Inspection: Identifiable, Codable, Equatable {
     // MARK: - Properties
     
-    var id: String { 
+    var id: String {
         if let date = inspection_date {
             return "\(date)-\(UUID().uuidString)"
         }
@@ -81,11 +86,11 @@ struct Inspection: Identifiable, Codable {
 }
 
 // MARK: - Violation Model
-
+// This struct was already correct and did not need changes.
 struct Violation: Identifiable, Codable, Equatable {
     // MARK: - Properties
     
-    var id: String { 
+    var id: String {
         if let code = violation_code {
             return "\(code)-\(UUID().uuidString)"
         }
@@ -98,13 +103,13 @@ struct Violation: Identifiable, Codable, Equatable {
     // MARK: - Equatable
     
     static func == (lhs: Violation, rhs: Violation) -> Bool {
-        lhs.violation_code == rhs.violation_code && 
+        lhs.violation_code == rhs.violation_code &&
         lhs.violation_description == rhs.violation_description
     }
 }
 
 // MARK: - Date Helper
-
+// This struct was correct and did not need changes.
 struct DateHelper {
     static func formatDate(_ dateStr: String?) -> String {
         guard let dateStr = dateStr, let date = parseDate(dateStr) else { return "N/A" }
