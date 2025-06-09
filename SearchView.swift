@@ -118,6 +118,7 @@ struct SearchView: View {
         .refreshable {
             await viewModel.performSearch()
         }
+        .transition(.opacity.animation(.easeInOut(duration: 0.3))) // <-- ADD THIS LINE
     }
     
     // ##### THIS IS THE UPDATED SUBVIEW #####
@@ -171,9 +172,53 @@ struct SearchView: View {
 
     private var searchBar: some View {
         HStack {
-            TextField("Search for a restaurant", text: $viewModel.searchTerm).font(.system(size: 16, weight: .regular, design: .rounded)).foregroundColor(.primary).padding(10).background(Color(.systemGray5)).cornerRadius(8).shadow(color: .gray.opacity(0.2), radius: 3, x: 0, y: 1).focused($isSearchFieldFocused).submitLabel(.search).onSubmit { submitSearch() }
-            Button { submitSearch() } label: { Image(systemName: "magnifyingglass").font(.title3).padding(10).foregroundColor(.white).background(Color.blue).cornerRadius(8).shadow(color: .gray.opacity(0.3), radius: 3, x: 0, y: 1) }.buttonStyle(AnimatedButtonStyle()).accessibilityLabel("Search")
-        }.padding(.horizontal)
+            // We use a ZStack to overlay the clear button on the TextField.
+            ZStack(alignment: .trailing) {
+                TextField("Search for a restaurant", text: $viewModel.searchTerm)
+                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                    .foregroundColor(.primary)
+                    .padding(10)
+                    // Add extra padding on the right to make space for the button.
+                    .padding(.trailing, 25)
+                    .background(Color(.systemGray5))
+                    .cornerRadius(8)
+                    .shadow(color: .gray.opacity(0.2), radius: 3, x: 0, y: 1)
+                    .focused($isSearchFieldFocused)
+                    .submitLabel(.search)
+                    .onSubmit {
+                        submitSearch()
+                    }
+
+                // This conditionally shows the 'x' button only when there's text.
+                if !viewModel.searchTerm.isEmpty {
+                    Button {
+                        // The action simply calls the resetSearch function.
+                        viewModel.resetSearch()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(Color(UIColor.systemGray2))
+                    }
+                    // Add padding to position the button inside the text field.
+                    .padding(.trailing, 8)
+                }
+            }
+            
+            // The main search button remains the same.
+            Button {
+                submitSearch()
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.title3)
+                    .padding(10)
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                    .shadow(color: .gray.opacity(0.3), radius: 3, x: 0, y: 1)
+            }
+            .buttonStyle(AnimatedButtonStyle())
+            .accessibilityLabel("Search")
+        }
+        .padding(.horizontal)
     }
 
     private func errorView(message: String) -> some View {

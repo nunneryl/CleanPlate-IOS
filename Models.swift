@@ -3,8 +3,6 @@
 import Foundation
 
 // MARK: - Restaurant Model
-// This struct remains the same, but will now correctly conform to Equatable
-// because the Inspection struct below is now also Equatable.
 struct Restaurant: Identifiable, Codable, Equatable {
     // MARK: - Properties
     
@@ -55,9 +53,6 @@ struct Restaurant: Identifiable, Codable, Equatable {
 }
 
 // MARK: - Inspection Model
-
-// ##### THIS IS THE CORRECTED LINE #####
-// Added `, Equatable` to allow this struct to be compared.
 struct Inspection: Identifiable, Codable, Equatable {
     // MARK: - Properties
     
@@ -86,7 +81,6 @@ struct Inspection: Identifiable, Codable, Equatable {
 }
 
 // MARK: - Violation Model
-// This struct was already correct and did not need changes.
 struct Violation: Identifiable, Codable, Equatable {
     // MARK: - Properties
     
@@ -107,9 +101,9 @@ struct Violation: Identifiable, Codable, Equatable {
         lhs.violation_description == rhs.violation_description
     }
 }
+// Note: The stray character 'å' that was here has been removed.
 
 // MARK: - Date Helper
-// This struct was correct and did not need changes.
 struct DateHelper {
     static func formatDate(_ dateStr: String?) -> String {
         guard let dateStr = dateStr, let date = parseDate(dateStr) else { return "N/A" }
