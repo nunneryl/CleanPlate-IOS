@@ -1,5 +1,3 @@
-// MARK: - FINAL POLISHED FILE: SearchView.swift
-
 import SwiftUI
 import os
 import FirebaseAnalytics
@@ -35,6 +33,15 @@ struct SearchView: View {
     @FocusState private var isSearchFieldFocused: Bool
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
+    @State private var isShowingFilterSheet = false
+
+    // UPDATED to check the new CuisineOption enum
+    private var isFilterActive: Bool {
+        return viewModel.selectedBoro != .any ||
+               viewModel.selectedGrade != .any ||
+               viewModel.selectedCuisine != .any
+    }
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -44,7 +51,8 @@ struct SearchView: View {
                     VStack(spacing: 20) {
                         headerSection
                         searchBar
-                    }.padding(.top, 20)
+                    }
+                    .padding(.top, 20)
 
                     if viewModel.isLoading && viewModel.restaurants.isEmpty {
                         SkeletonLoadingView().transition(.opacity)
@@ -60,7 +68,7 @@ struct SearchView: View {
                         Spacer()
                     } else {
                         Spacer()
-                        disclaimerText // This is the view we are adjusting
+                        disclaimerText
                         Spacer()
                     }
                 }
@@ -77,6 +85,15 @@ struct SearchView: View {
                 setupNotificationObservers()
             }
             .onDisappear(perform: removeNotificationObservers)
+            // UPDATED to pass the new binding and remove the options array
+            .sheet(isPresented: $isShowingFilterSheet) {
+                FilterSortView(
+                    sortSelection: $viewModel.selectedSort,
+                    boroSelection: $viewModel.selectedBoro,
+                    gradeSelection: $viewModel.selectedGrade,
+                    cuisineSelection: $viewModel.selectedCuisine
+                )
+            }
         }
         .navigationViewStyle(.stack)
         .onAppear {
@@ -86,6 +103,74 @@ struct SearchView: View {
     }
 
     // MARK: - Subviews
+
+    private var headerSection: some View {
+        VStack(spacing: horizontalSizeClass == .compact ? 4 : 6) {
+            Image(systemName: "fork.knife.circle.fill").resizable().scaledToFit().frame(width: horizontalSizeClass == .compact ? 50 : 60, height: horizontalSizeClass == .compact ? 50 : 60).foregroundColor(.blue).shadow(radius: 2).onTapGesture {
+                viewModel.resetSearch()
+                isSearchFieldFocused = false
+            }
+            Text("CleanPlate").font(.system(size: horizontalSizeClass == .compact ? 26 : 32, weight: .bold, design: .rounded)).foregroundColor(.primary)
+            Text("Your Guide to Safe & Smart Dining").font(.system(size: horizontalSizeClass == .compact ? 14 : 16, weight: .regular, design: .rounded)).foregroundColor(.secondary).multilineTextAlignment(.center).padding(.horizontal, 20)
+        }
+    }
+
+    private var searchBar: some View {
+        HStack {
+            ZStack(alignment: .trailing) {
+                TextField("Search for a restaurant", text: $viewModel.searchTerm)
+                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                    .foregroundColor(.primary)
+                    .padding(10)
+                    .padding(.trailing, 25)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .shadow(color: .gray.opacity(0.2), radius: 3, x: 0, y: 1)
+                    .focused($isSearchFieldFocused)
+                    .submitLabel(.search)
+                    .onSubmit {
+                        submitSearch()
+                    }
+
+                if !viewModel.searchTerm.isEmpty {
+                    Button {
+                        viewModel.resetSearch()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(Color(UIColor.systemGray2))
+                    }
+                    .padding(.trailing, 8)
+                }
+            }
+            
+            Button {
+                submitSearch()
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.title3)
+                    .padding(10)
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                    .shadow(color: .gray.opacity(0.3), radius: 3, x: 0, y: 1)
+            }
+            .buttonStyle(AnimatedButtonStyle())
+            .accessibilityLabel("Search")
+
+            Button {
+                isSearchFieldFocused = false
+                isShowingFilterSheet = true
+            } label: {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .font(.title3)
+                    .foregroundColor(isFilterActive ? .white : .blue)
+                    .frame(width: 44, height: 44)
+                    .background(isFilterActive ? Color.blue : Color(.systemGray6))
+                    .cornerRadius(10)
+            }
+        }
+        .padding(.horizontal)
+    }
 
     private var mainSearchResults: some View {
         List {
@@ -118,26 +203,24 @@ struct SearchView: View {
         .refreshable {
             await viewModel.performSearch()
         }
-        .transition(.opacity.animation(.easeInOut(duration: 0.3))) // <-- ADD THIS LINE
     }
     
-    // ##### THIS IS THE UPDATED SUBVIEW #####
     private var disclaimerText: some View {
-        Text("CleanPlate provides NYC restaurant inspection data for informational purposes.\n\nHealth ratings are just one factor to consider when choosing where to eat.")
-            // 1. Font size increased by 2 points for better readability.
-            .font(.system(size: horizontalSizeClass == .compact ? 14 : 16))
-            .italic()
-            .foregroundColor(.secondary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, horizontalSizeClass == .compact ? 20 : 30)
-            // 2. Padding added to the bottom to push it up from the center.
-            .padding(.bottom, 50)
+        VStack {
+            Spacer()
+            Text("CleanPlate provides NYC restaurant inspection data for informational purposes.\n\nHealth ratings are just one factor to consider when choosing where to eat.")
+                .font(.system(size: horizontalSizeClass == .compact ? 14 : 16))
+                .italic()
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, horizontalSizeClass == .compact ? 30 : 40)
+            Spacer()
+        }
     }
-
-    // ----- The rest of the file is unchanged -----
 
     private var emptySearchResultsView: some View {
         VStack(spacing: 20) {
+            Spacer()
             Image(systemName: "magnifyingglass").font(.system(size: 40)).foregroundColor(.gray.opacity(0.6)).padding(.bottom, 10)
             Text("No restaurants found").font(.system(size: 18, weight: .semibold, design: .rounded)).foregroundColor(.primary)
             VStack(alignment: .leading, spacing: 16) {
@@ -156,82 +239,29 @@ struct SearchView: View {
                 }
             }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 20)
             Button { viewModel.resetSearch() } label: { Text("Clear Search") }.buttonStyle(PrimaryButtonStyle()).padding(.top, 16)
-        }.padding(.horizontal, 16).padding(.vertical, 30).multilineTextAlignment(.leading).frame(maxWidth: .infinity).background(Color(.systemBackground)).transition(.opacity).animation(.easeInOut(duration: 0.3), value: viewModel.searchTerm)
-    }
-
-    private var headerSection: some View {
-        VStack(spacing: horizontalSizeClass == .compact ? 4 : 6) {
-            Image(systemName: "fork.knife.circle.fill").resizable().scaledToFit().frame(width: horizontalSizeClass == .compact ? 50 : 60, height: horizontalSizeClass == .compact ? 50 : 60).foregroundColor(.blue).shadow(radius: 2).onTapGesture {
-                viewModel.resetSearch()
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
-            Text("CleanPlate").font(.system(size: horizontalSizeClass == .compact ? 26 : 32, weight: .bold, design: .rounded)).foregroundColor(.primary)
-            Text("Your Guide to Safe & Smart Dining").font(.system(size: horizontalSizeClass == .compact ? 14 : 16, weight: .regular, design: .rounded)).foregroundColor(.secondary).multilineTextAlignment(.center).padding(.horizontal, 20)
+            Spacer()
         }
-    }
-
-    private var searchBar: some View {
-        HStack {
-            // We use a ZStack to overlay the clear button on the TextField.
-            ZStack(alignment: .trailing) {
-                TextField("Search for a restaurant", text: $viewModel.searchTerm)
-                    .font(.system(size: 16, weight: .regular, design: .rounded))
-                    .foregroundColor(.primary)
-                    .padding(10)
-                    // Add extra padding on the right to make space for the button.
-                    .padding(.trailing, 25)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-                    .shadow(color: .gray.opacity(0.2), radius: 3, x: 0, y: 1)
-                    .focused($isSearchFieldFocused)
-                    .submitLabel(.search)
-                    .onSubmit {
-                        submitSearch()
-                    }
-
-                // This conditionally shows the 'x' button only when there's text.
-                if !viewModel.searchTerm.isEmpty {
-                    Button {
-                        // The action simply calls the resetSearch function.
-                        viewModel.resetSearch()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(Color(UIColor.systemGray2))
-                    }
-                    // Add padding to position the button inside the text field.
-                    .padding(.trailing, 8)
-                }
-            }
-            
-            // The main search button remains the same.
-            Button {
-                submitSearch()
-            } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.title3)
-                    .padding(10)
-                    .foregroundColor(.white)
-                    .background(Color.blue)
-                    .cornerRadius(8)
-                    .shadow(color: .gray.opacity(0.3), radius: 3, x: 0, y: 1)
-            }
-            .buttonStyle(AnimatedButtonStyle())
-            .accessibilityLabel("Search")
-        }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 30)
+        .multilineTextAlignment(.leading)
     }
 
     private func errorView(message: String) -> some View {
-        VStack(spacing: 12) {
-             Image(systemName: "exclamationmark.triangle.fill").font(.largeTitle).foregroundColor(.red)
-            Text(message).font(.system(size: 14, weight: .medium, design: .rounded)).foregroundColor(.red).multilineTextAlignment(.center).padding(.horizontal)
-            Button { Task { await viewModel.performSearch() } } label: { Text("Try Again") }.buttonStyle(PrimaryButtonStyle()).accessibilityLabel("Try search again")
-        }.padding().background(Color(.systemGray6)).cornerRadius(10).shadow(radius: 2)
+        VStack {
+            Spacer()
+            VStack(spacing: 12) {
+                 Image(systemName: "exclamationmark.triangle.fill").font(.largeTitle).foregroundColor(.red)
+                Text(message).font(.system(size: 14, weight: .medium, design: .rounded)).foregroundColor(.red).multilineTextAlignment(.center).padding(.horizontal)
+                Button { Task { await viewModel.performSearch() } } label: { Text("Try Again") }.buttonStyle(PrimaryButtonStyle()).accessibilityLabel("Try search again")
+            }.padding().background(Color(.systemGray6)).cornerRadius(10).shadow(radius: 2)
+            Spacer()
+        }
+        .padding()
     }
     
     private func submitSearch() {
         isSearchFieldFocused = false
-        HapticsManager.shared.impact(style: .medium) // Triggers a medium-intensity vibration
+        HapticsManager.shared.impact(style: .medium)
         Task {
             await viewModel.performSearch()
         }
@@ -241,35 +271,25 @@ struct SearchView: View {
         var formatted = street
         if formatted.lowercased().contains("avenue") { formatted = formatted.replacingOccurrences(of: "AVENUE", with: "Ave", options: .caseInsensitive) }
         if formatted.lowercased().contains("street") { formatted = formatted.replacingOccurrences(of: "STREET", with: "St", options: .caseInsensitive) }
-        if formatted.lowercased().contains("place") { formatted = formatted.replacingOccurrences(of: "PLACE", with: "Pl", options: .caseInsensitive) }
-        if formatted.lowercased().contains("road") { formatted = formatted.replacingOccurrences(of: "ROAD", with: "Rd", options: .caseInsensitive) }
-        if formatted.lowercased().contains("boulevard") { formatted = formatted.replacingOccurrences(of: "BOULEVARD", with: "Blvd", options: .caseInsensitive) }
         return formatted
     }
 
     private func formatBorough(_ boro: String) -> String {
-        switch boro.uppercased() {
-            case "MANHATTAN": return "Manhattan"
-            case "BROOKLYN": return "Brooklyn"
-            case "QUEENS": return "Queens"
-            case "BRONX": return "Bronx"
-            case "STATEN ISLAND": return "Staten Island"
-            default: return boro
-        }
+        return boro.capitalized
     }
 
     private func setupNotificationObservers() {
-         NotificationCenter.default.addObserver(forName: .homeTabTapped, object: nil, queue: .main) { _ in Task { @MainActor in viewModel.resetSearch(); UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) } }
-         NotificationCenter.default.addObserver(forName: .resetSearch, object: nil, queue: .main) { _ in Task { @MainActor in viewModel.resetSearch() } }
+          NotificationCenter.default.addObserver(forName: .homeTabTapped, object: nil, queue: .main) { _ in Task { @MainActor in viewModel.resetSearch(); isSearchFieldFocused = false } }
+          NotificationCenter.default.addObserver(forName: .resetSearch, object: nil, queue: .main) { _ in Task { @MainActor in viewModel.resetSearch() } }
     }
 
     private func removeNotificationObservers() {
-         NotificationCenter.default.removeObserver(self, name: .homeTabTapped, object: nil)
-         NotificationCenter.default.removeObserver(self, name: .resetSearch, object: nil)
+          NotificationCenter.default.removeObserver(self, name: .homeTabTapped, object: nil)
+          NotificationCenter.default.removeObserver(self, name: .resetSearch, object: nil)
     }
 }
 
-// MARK: - Skeleton Loading View
+// Skeleton Views are unchanged
 struct SkeletonLoadingView: View {
     var body: some View { VStack(spacing: 12) { ForEach(0..<5, id: \.self) { _ in SkeletonRow() } }.padding(.horizontal).accessibilityElement(children: .ignore).accessibilityLabel("Loading search results") }
 }

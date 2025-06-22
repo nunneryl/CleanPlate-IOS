@@ -6,8 +6,18 @@ import Foundation
 struct Restaurant: Identifiable, Codable, Equatable {
     // MARK: - Properties
     
-    var id: String { camis ?? UUID().uuidString }
-    let camis: String?
+    // This is the main change. We now correctly handle that `camis` is a number (Int).
+    // The `id` is then safely converted to a String to satisfy the `Identifiable` protocol.
+    var id: String {
+        if let camis = camis {
+            return String(camis)
+        }
+        return UUID().uuidString
+    }
+    
+    // We are changing camis from String? to Int? to match the backend JSON.
+    let camis: Int?
+    
     let dba: String?
     let boro: String?
     let building: String?
@@ -30,7 +40,6 @@ struct Restaurant: Identifiable, Codable, Equatable {
     func formattedPhone() -> String {
         guard let phone = phone, phone.count >= 10 else { return "N/A" }
         
-        // Format as (XXX) XXX-XXXX
         let cleaned = phone.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
         let index = cleaned.index(cleaned.startIndex, offsetBy: min(3, cleaned.count))
         let areaCode = cleaned[..<index]
@@ -101,7 +110,6 @@ struct Violation: Identifiable, Codable, Equatable {
         lhs.violation_description == rhs.violation_description
     }
 }
-// Note: The stray character 'å' that was here has been removed.
 
 // MARK: - Date Helper
 struct DateHelper {

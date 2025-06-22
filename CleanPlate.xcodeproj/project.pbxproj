@@ -10,6 +10,8 @@
 		326C9E872DC6A6EB007457E4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 326C9E862DC6A6EB007457E4 /* FirebaseCrashlytics */; };
 		32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */; };
 		32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */; };
+		32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */; };
+		32A4CAEB2E01A7A700CC8C37 /* FilterSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */; };
 		32C138BB2D8F66CF006F4121 /* NYCFoodRatingsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */; };
 		32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138B82D8F66CF006F4121 /* MainTabView.swift */; };
 		32C138C92D8F67E2006F4121 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C72D8F67E2006F4121 /* SearchViewModel.swift */; };
@@ -53,6 +55,8 @@
 		329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
 		32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManager.swift; sourceTree = "<group>"; };
+		32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterOptions.swift; sourceTree = "<group>"; };
+		32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSortView.swift; sourceTree = "<group>"; };
 		32C138B82D8F66CF006F4121 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NYCFoodRatingsApp.swift; sourceTree = "<group>"; };
 		32C138BE2D8F671B006F4121 /* CleanPlate-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CleanPlate-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -128,6 +132,8 @@
 				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
 				32C138C62D8F67E2006F4121 /* SearchView.swift */,
 				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
+				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
+				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
 				32D9DA662CBDFB7200BA92E1 /* CleanPlate */,
 				32D9DA772CBDFB7900BA92E1 /* NYCFoodRatingsTests */,
 				32D9DA812CBDFB7900BA92E1 /* NYCFoodRatingsUITests */,
@@ -324,6 +330,7 @@
 				32C138C92D8F67E2006F4121 /* SearchViewModel.swift in Sources */,
 				32C138CA2D8F67E2006F4121 /* AboutView.swift in Sources */,
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
+				32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */,
 				32C138D42D905217006F4121 /* ViolationsView.swift in Sources */,
 				32C138CC2D8F67E2006F4121 /* APIService.swift in Sources */,
 				32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */,
@@ -333,6 +340,7 @@
 				32C138CF2D8F67E2006F4121 /* Models.swift in Sources */,
 				32C138D02D8F67E2006F4121 /* FAQView.swift in Sources */,
 				32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */,
+				32A4CAEB2E01A7A700CC8C37 /* FilterSortView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,7 +505,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -535,7 +543,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
