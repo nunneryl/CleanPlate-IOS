@@ -2,7 +2,7 @@ import Foundation
 
 struct Restaurant: Identifiable, Codable, Equatable {
     // This now correctly expects camis as a String, matching the JSON data
-    let camis: String?
+    let camis: Int?
     let dba: String?
     let boro: String?
     let building: String?
@@ -15,7 +15,7 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let inspections: [Inspection]?
 
     // The 'id' can simply be the camis string
-    var id: String { camis ?? UUID().uuidString }
+    var id: String { camis.map(String.init) ?? UUID().uuidString }
     
     // All other helper functions remain the same
     func fullAddress() -> String {
@@ -78,7 +78,7 @@ struct DateHelper {
     static func parseDate(_ dateStr: String?) -> Date? {
         guard let dateStr = dateStr else { return nil }
         let formatter = DateFormatter()
-        for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "E, dd MMM yyyy HH:mm:ss z"] {
+        for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "E, dd MMM yyyy HH:mm:ss z"] {
             formatter.dateFormat = dateFormat
             if let date = formatter.date(from: dateStr) {
                 return date

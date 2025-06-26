@@ -16,9 +16,7 @@ class SearchViewModel: ObservableObject {
     @Published var selectedSort: SortOption = .relevance
     @Published var selectedBoro: BoroOption = .any
     @Published var selectedGrade: GradeOption = .any
-    @Published var selectedCuisine: CuisineOption = .any // UPDATED to use the new enum
-
-    // The dynamic fetching logic and hardcoded array have been removed.
+    @Published var selectedCuisine: CuisineOption = .any
 
     // MARK: - Pagination State
     @Published private(set) var currentPage = 1
@@ -31,8 +29,6 @@ class SearchViewModel: ObservableObject {
 
     // MARK: - Initializer
     init() {
-        // No longer needs to fetch cuisines.
-        
         $searchTerm
             .removeDuplicates()
             .sink { [weak self] term in
@@ -42,7 +38,6 @@ class SearchViewModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        // This publisher now correctly watches the new CuisineOption enum state.
         let filterPublishers = Publishers.CombineLatest4($selectedSort, $selectedBoro, $selectedGrade, $selectedCuisine)
         
         filterPublishers
@@ -57,6 +52,17 @@ class SearchViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    // MARK: - Private Helpers
+
+    private func apiFilterParameters() -> (sort: String?, grade: String?, boro: String?, cuisine: String?) {
+        let sortValue = (selectedSort == .relevance) ? nil : selectedSort.rawValue
+        let gradeValue = (selectedGrade == .any) ? nil : selectedGrade.rawValue
+        let boroValue = (selectedBoro == .any) ? nil : selectedBoro.rawValue
+        let cuisineValue = (selectedCuisine == .any) ? nil : selectedCuisine.rawValue
+        
+        return (sort: sortValue, grade: gradeValue, boro: boroValue, cuisine: cuisineValue)
+    }
+
     // MARK: - Public Methods
     
     func performSearch() async {
@@ -69,20 +75,17 @@ class SearchViewModel: ObservableObject {
         self.errorMessage = nil
 
         do {
-            // Prepare all optional values for the API call.
-            let sortValue = (selectedSort == .relevance) ? nil : selectedSort.rawValue
-            let gradeValue = (selectedGrade == .any) ? nil : selectedGrade.rawValue
-            let boroValue = (selectedBoro == .any) ? nil : selectedBoro.rawValue
-            let cuisineValue = (selectedCuisine == .any) ? nil : selectedCuisine.rawValue
+            // Call the new helper function
+            let filters = apiFilterParameters()
             
             let newRestaurants = try await APIService.shared.searchRestaurants(
                 query: searchTerm,
                 page: 1,
                 perPage: perPage,
-                grade: gradeValue,
-                boro: boroValue,
-                cuisine: cuisineValue,
-                sort: sortValue
+                grade: filters.grade,
+                boro: filters.boro,
+                cuisine: filters.cuisine,
+                sort: filters.sort
             )
             
             restaurants = newRestaurants
@@ -105,19 +108,17 @@ class SearchViewModel: ObservableObject {
         currentPage += 1
         
         do {
-            let sortValue = (selectedSort == .relevance) ? nil : selectedSort.rawValue
-            let gradeValue = (selectedGrade == .any) ? nil : selectedGrade.rawValue
-            let boroValue = (selectedBoro == .any) ? nil : selectedBoro.rawValue
-            let cuisineValue = (selectedCuisine == .any) ? nil : selectedCuisine.rawValue
+            // Call the new helper function
+            let filters = apiFilterParameters()
             
             let newRestaurants = try await APIService.shared.searchRestaurants(
                 query: searchTerm,
                 page: currentPage,
                 perPage: perPage,
-                grade: gradeValue,
-                boro: boroValue,
-                cuisine: cuisineValue,
-                sort: sortValue
+                grade: filters.grade,
+                boro: filters.boro,
+                cuisine: filters.cuisine,
+                sort: filters.sort
             )
             
             restaurants.append(contentsOf: newRestaurants)
@@ -142,7 +143,6 @@ class SearchViewModel: ObservableObject {
         currentPage = 1
         canLoadMorePages = true
         
-        // Reset all filters to their default ".any" or ".relevance" case.
         selectedSort = .relevance
         selectedBoro = .any
         selectedGrade = .any
