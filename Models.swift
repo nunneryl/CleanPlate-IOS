@@ -1,8 +1,8 @@
 import Foundation
 
 struct Restaurant: Identifiable, Codable, Equatable {
-    // This now correctly expects camis as a String, matching the JSON data
-    let camis: Int?
+    // CORRECTED: camis is now a String? to match the API data
+    let camis: String?
     let dba: String?
     let boro: String?
     let building: String?
@@ -12,12 +12,13 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let latitude: Double?
     let longitude: Double?
     let cuisine_description: String?
+    let grade_date: String?
     let inspections: [Inspection]?
 
-    // The 'id' can simply be the camis string
-    var id: String { camis.map(String.init) ?? UUID().uuidString }
+    // This id property now works correctly with camis as a String
+    var id: String { camis ?? UUID().uuidString }
     
-    // All other helper functions remain the same
+    // The rest of your helper functions like fullAddress() can remain as they are...
     func fullAddress() -> String {
         [building, street, boro, zipcode]
             .compactMap { $0 }
