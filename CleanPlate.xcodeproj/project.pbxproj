@@ -32,6 +32,8 @@
 		32D9DA792CBDFB7900BA92E1 /* NYCFoodRatingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D9DA782CBDFB7900BA92E1 /* NYCFoodRatingsTests.swift */; };
 		32D9DA832CBDFB7900BA92E1 /* NYCFoodRatingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D9DA822CBDFB7900BA92E1 /* NYCFoodRatingsUITests.swift */; };
 		32D9DA852CBDFB7900BA92E1 /* NYCFoodRatingsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D9DA842CBDFB7900BA92E1 /* NYCFoodRatingsUITestsLaunchTests.swift */; };
+		32DB85152E0F364C00CCE5D5 /* StaticMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */; };
+		32DB85172E0F373B00CCE5D5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32DB85162E0F373B00CCE5D5 /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +81,8 @@
 		32D9DA822CBDFB7900BA92E1 /* NYCFoodRatingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NYCFoodRatingsUITests.swift; sourceTree = "<group>"; };
 		32D9DA842CBDFB7900BA92E1 /* NYCFoodRatingsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NYCFoodRatingsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		32D9DA922CBDFDBB00BA92E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticMapView.swift; sourceTree = "<group>"; };
+		32DB85162E0F373B00CCE5D5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +91,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				32CB03562DB41D0000C8068D /* FirebaseAnalytics in Frameworks */,
+				32DB85172E0F373B00CCE5D5 /* MapKit.framework in Frameworks */,
 				326C9E872DC6A6EB007457E4 /* FirebaseCrashlytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -111,6 +116,7 @@
 		32A4A5082DC5533500B5E6EE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				32DB85162E0F373B00CCE5D5 /* MapKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -134,6 +140,7 @@
 				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
 				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
 				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
+				32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */,
 				32D9DA662CBDFB7200BA92E1 /* CleanPlate */,
 				32D9DA772CBDFB7900BA92E1 /* NYCFoodRatingsTests */,
 				32D9DA812CBDFB7900BA92E1 /* NYCFoodRatingsUITests */,
@@ -341,6 +348,7 @@
 				32C138D02D8F67E2006F4121 /* FAQView.swift in Sources */,
 				32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */,
 				32A4CAEB2E01A7A700CC8C37 /* FilterSortView.swift in Sources */,
+				32DB85152E0F364C00CCE5D5 /* StaticMapView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAnalytics
 
 struct FilterSortView: View {
     @Binding var sortSelection: SortOption
@@ -64,6 +65,17 @@ struct FilterSortView: View {
                         .bold()
                     } else {
                         Button("Apply") {
+                            
+                            // ---ANALYTICS BLOCK ---
+                                Analytics.logEvent("apply_filters_sort", parameters: [
+                                    // We only log the filters if they are not the default "Any"
+                                    "boro_selected": boroSelection == .any ? "none" : boroSelection.rawValue,
+                                    "grade_selected": gradeSelection == .any ? "none" : gradeSelection.rawValue,
+                                    "cuisine_selected": cuisineSelection == .any ? "none" : cuisineSelection.rawValue,
+                                    "sort_by": sortSelection.rawValue
+                                ])
+                                // --------------------------------
+
                             dismiss()
                         }
                     }

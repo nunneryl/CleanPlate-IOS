@@ -88,6 +88,14 @@ class SearchViewModel: ObservableObject {
                 sort: filters.sort
             )
             
+            // --- ADD SUCCESS ANALYTICS ---
+                       Analytics.logEvent("search_performed", parameters: [
+                           "search_term": searchTerm,
+                           "result_count": newRestaurants.count,
+                           "was_successful": true
+                       ])
+                       // -----------------------------
+            
             restaurants = newRestaurants
             currentPage = 1
             canLoadMorePages = newRestaurants.count == perPage
@@ -95,6 +103,15 @@ class SearchViewModel: ObservableObject {
 
         } catch {
             errorMessage = (error as? APIError)?.description ?? "An unknown error occurred."
+            
+            // --- ADD FAILURE ANALYTICS ---
+            Analytics.logEvent("search_performed", parameters: [
+                "search_term": searchTerm,
+                "was_successful": false,
+                "error_message": errorMessage ?? "unknown"
+            ])
+            // -----------------------------
+            
             hasPerformedSearch = true
         }
         
