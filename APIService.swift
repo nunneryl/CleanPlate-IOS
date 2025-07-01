@@ -34,7 +34,7 @@ class APIService {
     private init() {}
     
     // IMPORTANT: Make sure this points to your Railway preview URL for testing
-    private let baseURL = "https://cleanplate-cleanplate-pr-8.up.railway.app"
+    private let baseURL = "https://cleanplate-production.up.railway.app"
 
     func searchRestaurants(query: String, page: Int, perPage: Int, grade: String?, boro: String?, cuisine: String?, sort: String?) async throws -> [Restaurant] {
         
