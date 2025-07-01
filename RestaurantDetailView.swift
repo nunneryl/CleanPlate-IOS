@@ -154,31 +154,46 @@ struct RestaurantDetailView: View {
             Text(DateHelper.formatDate(inspection.inspection_date))
                 .font(.system(size: 16, weight: .semibold))
 
-            // --- THIS IS THE MODIFIED LOGIC BLOCK ---
-            // It now checks for the action and displays it if present
-            if let action = inspection.action,
-               action.lowercased().contains("closed by dohmh") {
+            // --- THIS IS THE FINAL MODIFIED LOGIC BLOCK ---
+            // It now handles "Closed", "Re-opened" with Grade, and normal grades
+            if let action = inspection.action?.lowercased() {
                 
-                HStack(alignment: .top) {
-                    Text("Status:")
-                        .font(.system(size: 14, weight: .semibold))
-                    Text(action) // Display the full action text from the API
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundColor(.red)
-                }
-            } else {
-                // Otherwise, it falls back to the normal grade display
-                HStack {
-                    Text("Grade:")
-                        .font(.system(size: 14))
-                    if let grade = inspection.grade, !grade.isEmpty, grade != "N/A" {
-                        Text(grade == "Z" ? "Grade Pending" : grade == "P" ? "Grade Pending" : grade == "N" ? "Not Yet Graded" : "Grade \(grade)")
-                            .font(.system(size: 14, weight: .bold)).foregroundColor(gradeColor(for: grade))
-                    } else {
-                        Text("No Grade Assigned")
-                            .font(.system(size: 14, weight: .regular)).foregroundColor(.gray)
+                if action.contains("closed by dohmh") {
+                    HStack(alignment: .top) {
+                        Text("Status:")
+                            .font(.system(size: 14, weight: .semibold))
+                        Text(inspection.action ?? "")
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundColor(.red)
                     }
+                } else if action.contains("re-opened by dohmh") {
+                    VStack(alignment: .leading, spacing: 8) { // Use a VStack to show both status and grade
+                        HStack(alignment: .top) {
+                            Text("Status:")
+                                .font(.system(size: 14, weight: .semibold))
+                            Text(inspection.action ?? "")
+                                .font(.system(size: 14, weight: .regular))
+                                .foregroundColor(.green)
+                        }
+                        // If a grade was assigned during re-opening, display it
+                        if let grade = inspection.grade, !grade.isEmpty {
+                            HStack {
+                                Text("Grade Assigned:")
+                                    .font(.system(size: 14))
+                                Text(formattedGrade(grade))
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(gradeColor(for: grade))
+                            }
+                        }
+                    }
+                } else {
+                    // Fallback to the normal grade display for all other cases
+                    displayGrade(for: inspection)
                 }
+                
+            } else {
+                // Fallback for inspections with no action text
+                displayGrade(for: inspection)
             }
             // --- END MODIFIED LOGIC BLOCK ---
 
@@ -195,6 +210,37 @@ struct RestaurantDetailView: View {
         }
         .padding().frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(UIColor.systemGray6)).cornerRadius(8)
+    }
+
+    // NOTE: I also moved the grade display logic into its own helper function for cleanliness.
+    // Please make sure this function is also in your RestaurantDetailView.swift file.
+    // You can place it with your other helper functions at the bottom.
+    private func displayGrade(for inspection: Inspection) -> some View {
+        HStack {
+            Text("Grade:")
+                .font(.system(size: 14))
+            if let grade = inspection.grade, !grade.isEmpty, grade != "N/A" {
+                Text(formattedGrade(grade))
+                    .font(.system(size: 14, weight: .bold)).foregroundColor(gradeColor(for: grade))
+            } else {
+                Text("No Grade Assigned")
+                    .font(.system(size: 14, weight: .regular)).foregroundColor(.gray)
+            }
+        }
+    }
+
+    // And ensure you have this helper function as well
+    private func formattedGrade(_ gradeCode: String?) -> String {
+        guard let grade = gradeCode, !grade.isEmpty else {
+            return "Not Graded"
+        }
+        switch grade {
+            case "A", "B", "C": return "Grade \(grade)"
+            case "Z": return "Grade Pending"
+            case "P": return "Grade Pending (Re-opening)"
+            case "N": return "Not Yet Graded"
+            default: return "N/A"
+        }
     }
 
     private var faqLink: some View {
