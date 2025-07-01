@@ -51,6 +51,7 @@ struct Inspection: Identifiable, Codable, Equatable {
     let critical_flag: String?
     let grade: String?
     let inspection_type: String?
+    let action: String?
     let violations: [Violation]?
     
     var formattedDate: String {

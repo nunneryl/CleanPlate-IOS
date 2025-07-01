@@ -1,4 +1,4 @@
-// MARK: - FINAL VERSION (with Chevron) RestaurantDetailView.swift
+// In RestaurantDetailView.swift
 
 import SwiftUI
 import os
@@ -10,21 +10,36 @@ struct RestaurantDetailView: View {
 
     private var shareableText: String {
         let restaurantName = restaurant.dba ?? "this restaurant"
-        let grade = currentDisplayGrade() ?? "Not Graded"
+        let status = currentDisplayStatus() ?? "Not Graded" // Uses the new status function
         let appStoreLink = "Download CleanPlate to search for any restaurant in NYC: https://apps.apple.com/us/app/cleanplate-nyc/id6745222863"
         
-        let gradeText: String
-        switch grade {
-            case "A", "B", "C": gradeText = "a New York City Department of Health Restaurant Inspection Grade \(grade)"
-            case "Grade_Pending": gradeText = "a Grade Pending status"
-            default: gradeText = "a 'Not Graded' status"
+        let statusText: String
+        switch status {
+            case "A", "B", "C":
+                statusText = "a New York City Department of Health Restaurant Inspection Grade \(status)"
+            case "Grade_Pending":
+                statusText = "a Grade Pending status"
+            case "Closed":
+                statusText = "a Closed by DOHMH status" // New share text for closed status
+            default:
+                statusText = "a 'Not Graded' status"
         }
         
         return """
         Here's the latest NYC health grade for \(restaurantName) via the CleanPlate app:
-        It currently has \(gradeText).
+        
+        It currently has \(statusText).
+        
         New to CleanPlate? \(appStoreLink)
         """
+    }
+    
+    private var addressURL: URL? {
+        let address = formattedAddress()
+        guard let encodedAddress = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            return nil
+        }
+        return URL(string: "http://maps.apple.com/?q=\(encodedAddress)")
     }
     
     @State private var isShowingShareSheet = false
@@ -45,11 +60,7 @@ struct RestaurantDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    self.isShowingShareSheet = true
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
-                }
+                Button { self.isShowingShareSheet = true } label: { Image(systemName: "square.and.arrow.up") }
             }
         }
         .sheet(isPresented: $isShowingShareSheet) {
@@ -69,7 +80,7 @@ struct RestaurantDetailView: View {
     }
 
     private var headerSection: some View {
-        HStack {
+        HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(restaurant.dba ?? "Restaurant Name")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -83,11 +94,10 @@ struct RestaurantDetailView: View {
                 }
             }
             Spacer()
-            if let displayGrade = currentDisplayGrade() {
-                Image(gradeImageName(for: displayGrade))
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 70, height: 70)
+            // This now uses our updated logic to get the correct image
+            if let displayStatus = currentDisplayStatus() {
+                        Image(gradeImageName(for: displayStatus))
+                            .resizable().scaledToFit().frame(width: 72, height: 72)
             }
         }
         .padding(.horizontal)
@@ -102,10 +112,8 @@ struct RestaurantDetailView: View {
                         isMapVisible.toggle()
                     }
                 }) {
-                    // --- THIS IS THE UPDATED PART ---
                     HStack {
                         Text(isMapVisible ? "Hide Map" : "Show Map")
-                        // This image now dynamically changes based on the map's visibility
                         Image(systemName: isMapVisible ? "chevron.up" : "chevron.down")
                     }
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -123,8 +131,6 @@ struct RestaurantDetailView: View {
             }
         }
     }
-    
-    // The rest of the file remains the same
     
     private var inspectionList: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -145,27 +151,50 @@ struct RestaurantDetailView: View {
     
     private func inspectionRow(inspection: Inspection) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-           Text(DateHelper.formatDate(inspection.inspection_date))
-               .font(.system(size: 16, weight: .semibold))
-           HStack {
-               Text("Grade:").font(.system(size: 14))
-               if let grade = inspection.grade, !grade.isEmpty, grade != "N/A" {
-                   Text(grade == "Z" ? "Grade Pending" : grade == "P" ? "Grade Pending" : grade == "N" ? "Not Yet Graded" : "Grade \(grade)")
-                       .font(.system(size: 14, weight: .bold)).foregroundColor(gradeColor(for: grade))
-               } else {
-                   Text("No Grade Assigned").font(.system(size: 14)).foregroundColor(.gray)
-               }
-           }
-           Text("Critical Flag: \(inspection.critical_flag ?? "N/A")").font(.system(size: 14))
-           if let violations = inspection.violations, !violations.isEmpty {
-                DisclosureGroup("Violations (\(violations.count))") { ViolationsView(violations: violations).padding(.top, 8) }
-                    .font(.system(size: 14, weight: .bold)).foregroundColor(.blue)
-           } else {
-                Text("No violations listed for this inspection.").font(.system(size: 14)).foregroundColor(.secondary)
-           }
-       }
-       .padding().frame(maxWidth: .infinity, alignment: .leading)
-       .background(Color(UIColor.systemGray6)).cornerRadius(8)
+            Text(DateHelper.formatDate(inspection.inspection_date))
+                .font(.system(size: 16, weight: .semibold))
+
+            // --- THIS IS THE MODIFIED LOGIC BLOCK ---
+            // It now checks for the action and displays it if present
+            if let action = inspection.action,
+               action.lowercased().contains("closed by dohmh") {
+                
+                HStack(alignment: .top) {
+                    Text("Status:")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text(action) // Display the full action text from the API
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(.red)
+                }
+            } else {
+                // Otherwise, it falls back to the normal grade display
+                HStack {
+                    Text("Grade:")
+                        .font(.system(size: 14))
+                    if let grade = inspection.grade, !grade.isEmpty, grade != "N/A" {
+                        Text(grade == "Z" ? "Grade Pending" : grade == "P" ? "Grade Pending" : grade == "N" ? "Not Yet Graded" : "Grade \(grade)")
+                            .font(.system(size: 14, weight: .bold)).foregroundColor(gradeColor(for: grade))
+                    } else {
+                        Text("No Grade Assigned")
+                            .font(.system(size: 14, weight: .regular)).foregroundColor(.gray)
+                    }
+                }
+            }
+            // --- END MODIFIED LOGIC BLOCK ---
+
+            Text("Critical Flag: \(inspection.critical_flag ?? "N/A")")
+                .font(.system(size: 14))
+            
+            if let violations = inspection.violations, !violations.isEmpty {
+                 DisclosureGroup("Violations (\(violations.count))") { ViolationsView(violations: violations).padding(.top, 8) }
+                     .font(.system(size: 14, weight: .bold)).foregroundColor(.blue)
+            } else {
+                 Text("No violations listed for this inspection.")
+                     .font(.system(size: 14, weight: .regular)).foregroundColor(.secondary)
+            }
+        }
+        .padding().frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(UIColor.systemGray6)).cornerRadius(8)
     }
 
     private var faqLink: some View {
@@ -185,26 +214,57 @@ struct RestaurantDetailView: View {
         }
     }
 
-    private func currentDisplayGrade() -> String? {
-        if let latest = filteredInspections().first, let grade = latest.grade, ["Z", "P"].contains(grade) { return "Grade_Pending" }
-        if let graded = filteredInspections().first(where: { ["A", "B", "C"].contains($0.grade ?? "") }) { return graded.grade }
-        if filteredInspections().contains(where: { $0.grade == "N" }) { return "Not_Graded" }
-        return filteredInspections().isEmpty ? "Not_Graded" : "Grade_Pending"
+    // --- LOGIC UPDATES ARE HERE ---
+
+    /// This function now determines the primary status of the restaurant (Closed, Graded, Pending, etc.)
+    private func currentDisplayStatus() -> String? {
+        guard let latestInspection = filteredInspections().first else {
+            return "Not_Graded"
+        }
+
+        // 1. Check for a closure first. This is top priority.
+        // It checks for both "Closed by DOHMH" and "re-closed by DOHMH"
+        if let action = latestInspection.action?.lowercased(), action.contains("closed by dohmh") {
+            return "Closed"
+        }
+
+        // 2. If not closed, proceed with the existing grade logic.
+        if let grade = latestInspection.grade, ["Z", "P"].contains(grade) {
+            return "Grade_Pending"
+        }
+        if let graded = filteredInspections().first(where: { ["A", "B", "C"].contains($0.grade ?? "") }) {
+            return graded.grade
+        }
+        if filteredInspections().contains(where: { $0.grade == "N" }) {
+            return "Not_Graded"
+        }
+        return "Grade_Pending"
     }
 
-    private func gradeImageName(for grade: String) -> String {
-        switch grade {
-            case "A": return "Grade_A"; case "B": return "Grade_B"; case "C": return "Grade_C"
-            case "Grade_Pending": return "Grade_Pending"; default: return "Not_Graded"
+    /// This function now knows about the new "Closed" status and your 'closed_down' asset.
+    private func gradeImageName(for status: String) -> String {
+        switch status {
+        case "A": return "Grade_A"
+        case "B": return "Grade_B"
+        case "C": return "Grade_C"
+        case "Grade_Pending": return "Grade_Pending"
+        case "Closed": return "closed_down" // <-- YOUR NEW ASSET
+        default: return "Not_Graded"
         }
     }
 
-    private func gradeColor(for grade: String) -> Color {
-        switch grade { case "A": .blue; case "B": .green; case "C": .orange; default: .gray }
+    /// This function provides a color for the status.
+    private func gradeColor(for status: String) -> Color {
+        switch status {
+        case "A": return .blue
+        case "B": return .green
+        case "C": return .orange
+        case "Closed": return .red // <-- RED for closed status
+        default: return .gray
+        }
     }
 }
 
-// Helper views remain the same
 struct ShareSheet: UIViewControllerRepresentable {
     var items: [Any]
     func makeUIViewController(context: Context) -> UIActivityViewController {
