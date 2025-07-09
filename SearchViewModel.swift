@@ -1,3 +1,5 @@
+// MARK: - UPDATED FILE: SearchViewModel.swift
+
 import SwiftUI
 import Combine
 import os
@@ -11,6 +13,13 @@ class SearchViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @Published var hasPerformedSearch: Bool = false
+    
+    // --- NEW PROPERTY FOR NAVIGATION RESET ---
+    @Published var navigationID = UUID()
+
+    // MARK: - Published Properties for Discovery Lists
+    @Published var recentlyGradedRestaurants: [Restaurant] = []
+    @Published var isLoadingDiscovery: Bool = false
     
     // MARK: - Published Properties for Filters & Sorting
     @Published var selectedSort: SortOption = .relevance
@@ -51,20 +60,24 @@ class SearchViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-
-    // MARK: - Private Helpers
-
-    private func apiFilterParameters() -> (sort: String?, grade: String?, boro: String?, cuisine: String?) {
-        let sortValue = (selectedSort == .relevance) ? nil : selectedSort.rawValue
-        let gradeValue = (selectedGrade == .any) ? nil : selectedGrade.rawValue
-        let boroValue = (selectedBoro == .any) ? nil : selectedBoro.rawValue
-        let cuisineValue = (selectedCuisine == .any) ? nil : selectedCuisine.rawValue
+    
+    // MARK: - Public Methods for Discovery
+    func loadDiscoveryLists() async {
+        guard recentlyGradedRestaurants.isEmpty, !isLoadingDiscovery else { return }
+        self.isLoadingDiscovery = true
         
-        return (sort: sortValue, grade: gradeValue, boro: boroValue, cuisine: cuisineValue)
+        do {
+            let restaurants = try await APIService.shared.fetchRecentlyGraded(limit: 20)
+            self.recentlyGradedRestaurants = restaurants
+            logger.info("Successfully loaded \(restaurants.count) recently graded restaurants for discovery.")
+        } catch {
+            logger.error("Failed to load discovery lists: \(error.localizedDescription)")
+        }
+        
+        self.isLoadingDiscovery = false
     }
 
-    // MARK: - Public Methods
-    
+    // MARK: - Public Methods for Search
     func performSearch() async {
         guard !searchTerm.isEmpty else {
             resetSearch()
@@ -75,7 +88,6 @@ class SearchViewModel: ObservableObject {
         self.errorMessage = nil
 
         do {
-            // Call the new helper function
             let filters = apiFilterParameters()
             
             let newRestaurants = try await APIService.shared.searchRestaurants(
@@ -88,13 +100,11 @@ class SearchViewModel: ObservableObject {
                 sort: filters.sort
             )
             
-            // --- ADD SUCCESS ANALYTICS ---
-                       Analytics.logEvent("search_performed", parameters: [
+            Analytics.logEvent("search_performed", parameters: [
                            "search_term": searchTerm,
                            "result_count": newRestaurants.count,
                            "was_successful": true
                        ])
-                       // -----------------------------
             
             restaurants = newRestaurants
             currentPage = 1
@@ -104,13 +114,11 @@ class SearchViewModel: ObservableObject {
         } catch {
             errorMessage = (error as? APIError)?.description ?? "An unknown error occurred."
             
-            // --- ADD FAILURE ANALYTICS ---
             Analytics.logEvent("search_performed", parameters: [
                 "search_term": searchTerm,
                 "was_successful": false,
                 "error_message": errorMessage ?? "unknown"
             ])
-            // -----------------------------
             
             hasPerformedSearch = true
         }
@@ -125,7 +133,6 @@ class SearchViewModel: ObservableObject {
         currentPage += 1
         
         do {
-            // Call the new helper function
             let filters = apiFilterParameters()
             
             let newRestaurants = try await APIService.shared.searchRestaurants(
@@ -165,6 +172,20 @@ class SearchViewModel: ObservableObject {
         selectedGrade = .any
         selectedCuisine = .any
         
+        // --- THIS IS THE KEY UPDATE ---
+        // Change the ID to force the NavigationView to reset
+        self.navigationID = UUID()
+        
         logger.info("Search state has been reset.")
+    }
+    
+    // MARK: - Private Helpers
+    private func apiFilterParameters() -> (sort: String?, grade: String?, boro: String?, cuisine: String?) {
+        let sortValue = (selectedSort == .relevance) ? nil : selectedSort.rawValue
+        let gradeValue = (selectedGrade == .any) ? nil : selectedGrade.rawValue
+        let boroValue = (selectedBoro == .any) ? nil : selectedBoro.rawValue
+        let cuisineValue = (selectedCuisine == .any) ? nil : selectedCuisine.rawValue
+        
+        return (sort: sortValue, grade: gradeValue, boro: boroValue, cuisine: cuisineValue)
     }
 }

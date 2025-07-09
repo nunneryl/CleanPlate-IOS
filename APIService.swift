@@ -1,3 +1,5 @@
+// MARK: - UPDATED FILE: APIService.swift
+
 import Foundation
 import os
 
@@ -33,7 +35,9 @@ class APIService {
     
     private init() {}
     
-    // IMPORTANT: Make sure this points to your Railway preview URL for testing
+    // --- IMPORTANT FOR TESTING ---
+    // Change this to your Railway preview URL to test your feature branch.
+    // Remember to change it back to the production URL before merging to main.
     private let baseURL = "https://cleanplate-production.up.railway.app"
 
     func searchRestaurants(query: String, page: Int, perPage: Int, grade: String?, boro: String?, cuisine: String?, sort: String?) async throws -> [Restaurant] {
@@ -72,12 +76,23 @@ class APIService {
         return try await performRequest(url: url)
     }
     
-    // The getCuisineTypes() function has been removed as it is no longer needed.
-    
-    func getRecentRestaurants() async throws -> [Restaurant] {
-        guard let url = URL(string: "\(baseURL)/recent") else {
+    // --- NEW FUNCTION ADDED HERE ---
+    func fetchRecentlyGraded(limit: Int) async throws -> [Restaurant] {
+        guard var components = URLComponents(string: baseURL) else {
             throw APIError.invalidURL
         }
+        components.path = "/lists/recently-graded"
+        
+        // Only add the 'limit' query item
+        components.queryItems = [
+            URLQueryItem(name: "limit", value: String(limit))
+        ]
+
+        guard let url = components.url else {
+            logger.error("Invalid URL for recently-graded endpoint.")
+            throw APIError.invalidURL
+        }
+        logger.info("Requesting recently graded restaurants from: \(url.absoluteString, privacy: .public)")
         return try await performRequest(url: url)
     }
 

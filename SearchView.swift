@@ -1,8 +1,10 @@
+// MARK: - UPDATED FILE: SearchView.swift
+
 import SwiftUI
 import os
 import FirebaseAnalytics
 
-// MARK: - Button Styles (Unchanged)
+// MARK: - Button Styles
 struct AnimatedButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -26,6 +28,55 @@ struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
+// MARK: - Discovery Card View
+struct DiscoveryCardView: View {
+    let restaurant: Restaurant
+
+    private var currentGrade: String? {
+        restaurant.inspections?.first(where: { ["A", "B", "C"].contains($0.grade ?? "") })?.grade
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    Text(restaurant.dba ?? "Restaurant")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(restaurant.boro?.capitalized ?? "NYC")
+                        .font(.system(size: 12, weight: .regular, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+            }
+            
+            Spacer()
+            
+            HStack {
+                Text(restaurant.relativeGradeDate)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundColor(.secondary)
+                Spacer()
+                if let grade = currentGrade {
+                    Image("Grade_\(grade)")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28, height: 28)
+                }
+            }
+        }
+        .frame(width: 160, height: 100)
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+        .shadow(color: .gray.opacity(0.15), radius: 4, x: 0, y: 2)
+    }
+}
+
+
 struct SearchView: View {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "SearchView")
 
@@ -34,8 +85,8 @@ struct SearchView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     @State private var isShowingFilterSheet = false
+    @State private var isRecentlyGradedExpanded = false
 
-    // UPDATED to check the new CuisineOption enum
     private var isFilterActive: Bool {
         return viewModel.selectedBoro != .any ||
                viewModel.selectedGrade != .any ||
@@ -67,6 +118,14 @@ struct SearchView: View {
                         errorView(message: errorMessage)
                         Spacer()
                     } else {
+                        // This is the default view state.
+                        
+                        // 1. Show the collapsible discovery list if the data is available.
+                        if !viewModel.recentlyGradedRestaurants.isEmpty {
+                            discoveryListView
+                        }
+                        
+                        // 2. Always show the disclaimer text in the remaining space.
                         Spacer()
                         disclaimerText
                         Spacer()
@@ -85,7 +144,6 @@ struct SearchView: View {
                 setupNotificationObservers()
             }
             .onDisappear(perform: removeNotificationObservers)
-            // UPDATED to pass the new binding and remove the options array
             .sheet(isPresented: $isShowingFilterSheet) {
                 FilterSortView(
                     sortSelection: $viewModel.selectedSort,
@@ -94,11 +152,16 @@ struct SearchView: View {
                     cuisineSelection: $viewModel.selectedCuisine
                 )
             }
-        }
+        } // <<<--- THIS IS THE CORRECTLY PLACED CLOSING BRACE FOR NavigationView
         .navigationViewStyle(.stack)
+        .id(viewModel.navigationID)
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView,
                                parameters: [AnalyticsParameterScreenName: "Search", AnalyticsParameterScreenClass: "\(SearchView.self)"])
+            
+            Task {
+                await viewModel.loadDiscoveryLists()
+            }
         }
     }
 
@@ -170,6 +233,59 @@ struct SearchView: View {
             }
         }
         .padding(.horizontal)
+    }
+    
+    private var discoveryListView: some View {
+        VStack(spacing: 0) {
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isRecentlyGradedExpanded.toggle()
+                }
+            }) {
+                HStack {
+                    Text("Recently Graded")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 16, weight: .semibold))
+                        .rotationEffect(.degrees(isRecentlyGradedExpanded ? 90 : 0))
+                }
+                .foregroundColor(.primary)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+            }
+            
+            if isRecentlyGradedExpanded {
+                VStack(spacing: 12) {
+                    HStack {
+                        Spacer()
+                        NavigationLink(destination: RecentlyGradedListView()) {
+                            HStack(spacing: 4) {
+                                Text("See All")
+                                Image(systemName: "chevron.right")
+                            }
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 16) {
+                            ForEach(viewModel.recentlyGradedRestaurants) { restaurant in
+                                NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)) {
+                                    DiscoveryCardView(restaurant: restaurant)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .frame(height: 140)
+                }
+                .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: -10)), removal: .opacity))
+                .padding(.bottom, 8)
+            }
+        }
     }
 
     private var mainSearchResults: some View {

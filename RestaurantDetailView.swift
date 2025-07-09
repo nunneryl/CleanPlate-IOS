@@ -154,8 +154,6 @@ struct RestaurantDetailView: View {
             Text(DateHelper.formatDate(inspection.inspection_date))
                 .font(.system(size: 16, weight: .semibold))
 
-            // --- THIS IS THE FINAL MODIFIED LOGIC BLOCK ---
-            // It now handles "Closed", "Re-opened" with Grade, and normal grades
             if let action = inspection.action?.lowercased() {
                 
                 if action.contains("closed by dohmh") {
@@ -212,9 +210,6 @@ struct RestaurantDetailView: View {
         .background(Color(UIColor.systemGray6)).cornerRadius(8)
     }
 
-    // NOTE: I also moved the grade display logic into its own helper function for cleanliness.
-    // Please make sure this function is also in your RestaurantDetailView.swift file.
-    // You can place it with your other helper functions at the bottom.
     private func displayGrade(for inspection: Inspection) -> some View {
         HStack {
             Text("Grade:")

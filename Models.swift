@@ -1,7 +1,8 @@
+// MARK: - UPDATED FILE: Models.swift
+
 import Foundation
 
 struct Restaurant: Identifiable, Codable, Equatable {
-    // CORRECTED: camis is now a String? to match the API data
     let camis: String?
     let dba: String?
     let boro: String?
@@ -15,10 +16,29 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let grade_date: String?
     let inspections: [Inspection]?
 
-    // This id property now works correctly with camis as a String
     var id: String { camis ?? UUID().uuidString }
     
-    // The rest of your helper functions like fullAddress() can remain as they are...
+    // --- NEW COMPUTED PROPERTY ADDED HERE ---
+    var relativeGradeDate: String {
+        guard let dateStr = self.grade_date, let date = DateHelper.parseDate(dateStr) else {
+            return ""
+        }
+        
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return "Graded today"
+        } else if calendar.isDateInYesterday(date) {
+            return "Graded yesterday"
+        } else {
+            let components = calendar.dateComponents([.day], from: date, to: Date())
+            if let day = components.day {
+                return "Graded \(day + 1) days ago"
+            }
+        }
+        return ""
+    }
+    
+    // The rest of your helper functions remain unchanged
     func fullAddress() -> String {
         [building, street, boro, zipcode]
             .compactMap { $0 }
@@ -44,6 +64,8 @@ struct Restaurant: Identifiable, Codable, Equatable {
         return phone
     }
 }
+
+// --- The rest of the file (Inspection, Violation, DateHelper) remains unchanged ---
 
 struct Inspection: Identifiable, Codable, Equatable {
     var id: String { inspection_date ?? UUID().uuidString }
@@ -80,6 +102,7 @@ struct DateHelper {
     static func parseDate(_ dateStr: String?) -> Date? {
         guard let dateStr = dateStr else { return nil }
         let formatter = DateFormatter()
+        // Expanded to handle grade_date format which might be 'yyyy-MM-dd'
         for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "E, dd MMM yyyy HH:mm:ss z"] {
             formatter.dateFormat = dateFormat
             if let date = formatter.date(from: dateStr) {

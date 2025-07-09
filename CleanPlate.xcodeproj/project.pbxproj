@@ -34,6 +34,9 @@
 		32D9DA852CBDFB7900BA92E1 /* NYCFoodRatingsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D9DA842CBDFB7900BA92E1 /* NYCFoodRatingsUITestsLaunchTests.swift */; };
 		32DB85152E0F364C00CCE5D5 /* StaticMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */; };
 		32DB85172E0F373B00CCE5D5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32DB85162E0F373B00CCE5D5 /* MapKit.framework */; };
+		32FC37DD2E1A033E00E72886 /* RecentlyGradedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */; };
+		32FC37DF2E1A056200E72886 /* RecentlyGradedListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */; };
+		32FC37E12E1DB32C00E72886 /* PreviewMockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +86,9 @@
 		32D9DA922CBDFDBB00BA92E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticMapView.swift; sourceTree = "<group>"; };
 		32DB85162E0F373B00CCE5D5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyGradedListView.swift; sourceTree = "<group>"; };
+		32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyGradedListViewModel.swift; sourceTree = "<group>"; };
+		32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMockData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +143,9 @@
 				32C138C42D8F67E2006F4121 /* Models.swift */,
 				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
 				32C138C62D8F67E2006F4121 /* SearchView.swift */,
+				32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */,
+				32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */,
+				32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */,
 				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
 				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
 				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
@@ -334,6 +343,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				32C138BB2D8F66CF006F4121 /* NYCFoodRatingsApp.swift in Sources */,
+				32FC37DF2E1A056200E72886 /* RecentlyGradedListViewModel.swift in Sources */,
 				32C138C92D8F67E2006F4121 /* SearchViewModel.swift in Sources */,
 				32C138CA2D8F67E2006F4121 /* AboutView.swift in Sources */,
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
@@ -343,12 +353,14 @@
 				32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */,
 				32C138CD2D8F67E2006F4121 /* InspectionDetailView.swift in Sources */,
 				32C138CE2D8F67E2006F4121 /* SearchView.swift in Sources */,
+				32FC37E12E1DB32C00E72886 /* PreviewMockData.swift in Sources */,
 				32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */,
 				32C138CF2D8F67E2006F4121 /* Models.swift in Sources */,
 				32C138D02D8F67E2006F4121 /* FAQView.swift in Sources */,
 				32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */,
 				32A4CAEB2E01A7A700CC8C37 /* FilterSortView.swift in Sources */,
 				32DB85152E0F364C00CCE5D5 /* StaticMapView.swift in Sources */,
+				32FC37DD2E1A033E00E72886 /* RecentlyGradedListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -513,7 +525,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -531,7 +543,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.1;
+				MARKETING_VERSION = 2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -551,7 +563,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -569,7 +581,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.1;
+				MARKETING_VERSION = 2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
