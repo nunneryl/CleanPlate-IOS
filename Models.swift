@@ -1,6 +1,7 @@
-// MARK: - UPDATED FILE: Models.swift
+// In file: Models.swift
 
 import Foundation
+import SwiftUI
 
 struct Restaurant: Identifiable, Codable, Equatable {
     let camis: String?
@@ -17,32 +18,19 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let inspections: [Inspection]?
 
     var id: String { camis ?? UUID().uuidString }
-    
-    // --- NEW COMPUTED PROPERTY ADDED HERE ---
+
     var relativeGradeDate: String {
-        guard let dateStr = self.grade_date, let date = DateHelper.parseDate(dateStr) else {
-            return ""
-        }
-        
+        guard let dateStr = self.grade_date, let date = DateHelper.parseDate(dateStr) else { return "" }
         let calendar = Calendar.current
-        if calendar.isDateInToday(date) {
-            return "Graded today"
-        } else if calendar.isDateInYesterday(date) {
-            return "Graded yesterday"
-        } else {
-            let components = calendar.dateComponents([.day], from: date, to: Date())
-            if let day = components.day {
-                return "Graded \(day + 1) days ago"
-            }
-        }
+        if calendar.isDateInToday(date) { return "Graded today" }
+        if calendar.isDateInYesterday(date) { return "Graded yesterday" }
+        let components = calendar.dateComponents([.day], from: date, to: Date())
+        if let day = components.day { return "Graded \(day + 1) days ago" }
         return ""
     }
     
-    // The rest of your helper functions remain unchanged
     func fullAddress() -> String {
-        [building, street, boro, zipcode]
-            .compactMap { $0 }
-            .joined(separator: ", ")
+        [building, street, boro, zipcode].compactMap { $0 }.joined(separator: ", ")
     }
     
     func formattedPhone() -> String {
@@ -50,7 +38,6 @@ struct Restaurant: Identifiable, Codable, Equatable {
         let cleaned = phone.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
         let index = cleaned.index(cleaned.startIndex, offsetBy: min(3, cleaned.count))
         let areaCode = cleaned[..<index]
-        
         if cleaned.count >= 6 {
             let prefixEnd = cleaned.index(index, offsetBy: 3)
             let prefix = cleaned[index..<prefixEnd]
@@ -63,9 +50,23 @@ struct Restaurant: Identifiable, Codable, Equatable {
         }
         return phone
     }
-}
 
-// --- The rest of the file (Inspection, Violation, DateHelper) remains unchanged ---
+    var formattedStreet: String {
+        guard let street = street else { return "" }
+        var formatted = street
+        if formatted.lowercased().contains("avenue") {
+            formatted = formatted.replacingOccurrences(of: "AVENUE", with: "Ave", options: .caseInsensitive)
+        }
+        if formatted.lowercased().contains("street") {
+            formatted = formatted.replacingOccurrences(of: "STREET", with: "St", options: .caseInsensitive)
+        }
+        return formatted
+    }
+    
+    var formattedBoro: String {
+        return boro?.capitalized ?? ""
+    }
+}
 
 struct Inspection: Identifiable, Codable, Equatable {
     var id: String { inspection_date ?? UUID().uuidString }
@@ -76,12 +77,32 @@ struct Inspection: Identifiable, Codable, Equatable {
     let action: String?
     let violations: [Violation]?
     
-    var formattedDate: String {
-        DateHelper.formatDate(inspection_date)
+    var formattedDate: String { DateHelper.formatDate(inspection_date) }
+    var hasCriticalViolations: Bool { critical_flag?.lowercased() == "critical" }
+    
+    // --- NEW COMPUTED PROPERTIES ADDED HERE ---
+    var displayGradeText: String {
+        guard let grade = self.grade, !grade.isEmpty else {
+            return "Not Graded"
+        }
+        switch grade {
+            case "A", "B", "C": return "Grade \(grade)"
+            case "Z": return "Grade Pending"
+            case "P": return "Grade Pending (Re-opening)"
+            case "N": return "Not Yet Graded"
+            default: return "N/A"
+        }
     }
     
-    var hasCriticalViolations: Bool {
-        critical_flag?.lowercased() == "critical"
+    var displayGradeColor: Color {
+        guard let grade = self.grade else { return .gray }
+        switch grade {
+            case "A": return .blue
+            case "B": return .green
+            case "C": return .orange
+            case "Z", "P", "N": return .gray
+            default: return .gray
+        }
     }
 }
 
@@ -102,7 +123,6 @@ struct DateHelper {
     static func parseDate(_ dateStr: String?) -> Date? {
         guard let dateStr = dateStr else { return nil }
         let formatter = DateFormatter()
-        // Expanded to handle grade_date format which might be 'yyyy-MM-dd'
         for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "E, dd MMM yyyy HH:mm:ss z"] {
             formatter.dateFormat = dateFormat
             if let date = formatter.date(from: dateStr) {
@@ -110,5 +130,17 @@ struct DateHelper {
             }
         }
         return nil
+    }
+}
+
+extension Restaurant {
+    var latestFinalGrade: String? {
+        return inspections?
+            .sorted {
+                guard let date1 = $0.inspection_date, let date2 = $1.inspection_date else { return false }
+                return date1 > date2
+            }
+            .first { ["A", "B", "C"].contains($0.grade ?? "") }?
+            .grade
     }
 }

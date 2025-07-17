@@ -36,9 +36,18 @@ enum GradeOption: String, CaseIterable, Identifiable {
     case c = "C"
     case pending = "P"
     var id: Self { self }
+    
+    var displayName: String {
+        switch self {
+        case .any: "Any"
+        case .a: "Grade A"
+        case .b: "Grade B"
+        case .c: "Grade C"
+        case .pending: "Grade Pending"
+        }
+    }
 }
 
-// This is the new, complete list of cuisines based on the DOHMH database information you provided.
 enum CuisineOption: String, CaseIterable, Identifiable {
     case any = "Any"
     case african = "African"

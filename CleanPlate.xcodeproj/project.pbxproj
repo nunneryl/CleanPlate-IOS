@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */; };
 		326C9E872DC6A6EB007457E4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 326C9E862DC6A6EB007457E4 /* FirebaseCrashlytics */; };
 		32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */; };
 		32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */; };
@@ -37,6 +38,8 @@
 		32FC37DD2E1A033E00E72886 /* RecentlyGradedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */; };
 		32FC37DF2E1A056200E72886 /* RecentlyGradedListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */; };
 		32FC37E12E1DB32C00E72886 /* PreviewMockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */; };
+		32FC37E32E215C2A00E72886 /* RestaurantDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37E22E215C2900E72886 /* RestaurantDetailViewModel.swift */; };
+		32FC37E52E25951500E72886 /* ReportIssueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37E42E25951400E72886 /* ReportIssueView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +60,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsLogger.swift; sourceTree = "<group>"; };
 		329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
 		32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManager.swift; sourceTree = "<group>"; };
@@ -89,6 +93,8 @@
 		32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyGradedListView.swift; sourceTree = "<group>"; };
 		32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyGradedListViewModel.swift; sourceTree = "<group>"; };
 		32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMockData.swift; sourceTree = "<group>"; };
+		32FC37E22E215C2900E72886 /* RestaurantDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantDetailViewModel.swift; sourceTree = "<group>"; };
+		32FC37E42E25951400E72886 /* ReportIssueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportIssueView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */,
+				3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */,
 				32C138B82D8F66CF006F4121 /* MainTabView.swift */,
 				32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */,
 				32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */,
@@ -142,11 +149,13 @@
 				32C138D32D905217006F4121 /* ViolationsView.swift */,
 				32C138C42D8F67E2006F4121 /* Models.swift */,
 				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
+				32FC37E22E215C2900E72886 /* RestaurantDetailViewModel.swift */,
+				32FC37E42E25951400E72886 /* ReportIssueView.swift */,
 				32C138C62D8F67E2006F4121 /* SearchView.swift */,
+				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
 				32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */,
 				32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */,
 				32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */,
-				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
 				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
 				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
 				32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */,
@@ -344,7 +353,9 @@
 			files = (
 				32C138BB2D8F66CF006F4121 /* NYCFoodRatingsApp.swift in Sources */,
 				32FC37DF2E1A056200E72886 /* RecentlyGradedListViewModel.swift in Sources */,
+				32FC37E32E215C2A00E72886 /* RestaurantDetailViewModel.swift in Sources */,
 				32C138C92D8F67E2006F4121 /* SearchViewModel.swift in Sources */,
+				3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */,
 				32C138CA2D8F67E2006F4121 /* AboutView.swift in Sources */,
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
 				32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */,
@@ -357,6 +368,7 @@
 				32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */,
 				32C138CF2D8F67E2006F4121 /* Models.swift in Sources */,
 				32C138D02D8F67E2006F4121 /* FAQView.swift in Sources */,
+				32FC37E52E25951500E72886 /* ReportIssueView.swift in Sources */,
 				32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */,
 				32A4CAEB2E01A7A700CC8C37 /* FilterSortView.swift in Sources */,
 				32DB85152E0F364C00CCE5D5 /* StaticMapView.swift in Sources */,
@@ -525,7 +537,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -543,7 +555,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -563,7 +575,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -581,7 +593,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

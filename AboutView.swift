@@ -80,9 +80,22 @@ struct AboutView: View {
 
                 // Legal Section
                 Section(header: Text("Legal")) {
-                     Link("Privacy Policy", destination: URL(string: "https://cleanplate.support/privacy.html")!)
-                        .padding(.vertical, 4)
+                    HStack {
+                        // Add an icon for visual context
+                        Image(systemName: "shield.lefthalf.filled")
+                            .foregroundColor(.secondary)
+                        
+                        Link("Privacy Policy", destination: URL(string: "https://cleanplate.support/privacy.html")!)
+                        
+                        Spacer()
+                        
+                        // A chevron can better indicate that this is a link
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color(.systemGray3))
+                    }
                 }
+                .foregroundColor(.primary) // Apply this to make the Link text black/white
                 
                 // This section will display the app version at the bottom of the list.
                 Section {

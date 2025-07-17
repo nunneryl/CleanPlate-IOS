@@ -1,4 +1,4 @@
-// MARK: - UPDATED FILE: SearchViewModel.swift
+// In file: SearchViewModel.swift
 
 import SwiftUI
 import Combine
@@ -7,30 +7,64 @@ import FirebaseAnalytics
 
 @MainActor
 class SearchViewModel: ObservableObject {
-    // MARK: - Published Properties for Search State
+    
+    // MARK: - State Management
+    enum SearchState {
+        case idle
+        case loading
+        case success([Restaurant])
+        case error(String)
+        case loadingMore([Restaurant])
+    }
+    
+    @Published var state: SearchState = .idle
+    
+    // MARK: - Search & Filter Properties
     @Published var searchTerm: String = ""
-    @Published var restaurants: [Restaurant] = []
-    @Published var isLoading: Bool = false
-    @Published var errorMessage: String? = nil
-    @Published var hasPerformedSearch: Bool = false
-    
-    // --- NEW PROPERTY FOR NAVIGATION RESET ---
-    @Published var navigationID = UUID()
-
-    // MARK: - Published Properties for Discovery Lists
-    @Published var recentlyGradedRestaurants: [Restaurant] = []
-    @Published var isLoadingDiscovery: Bool = false
-    
-    // MARK: - Published Properties for Filters & Sorting
     @Published var selectedSort: SortOption = .relevance
     @Published var selectedBoro: BoroOption = .any
     @Published var selectedGrade: GradeOption = .any
     @Published var selectedCuisine: CuisineOption = .any
-
-    // MARK: - Pagination State
-    @Published private(set) var currentPage = 1
+    
+    // MARK: - Discovery List Properties
+    @Published var recentlyGradedRestaurants: [Restaurant] = []
+    @Published var isLoadingDiscovery: Bool = false
+    
+    // MARK: - Navigation & Pagination
+    @Published var navigationID = UUID()
     @Published private(set) var canLoadMorePages = true
+    private var currentPage = 1
     private let perPage = 25
+
+    // MARK: - Computed Properties (for View compatibility)
+    var restaurants: [Restaurant] {
+        switch state {
+        case .success(let restaurants), .loadingMore(let restaurants):
+            return restaurants
+        default:
+            return []
+        }
+    }
+    
+    var isLoading: Bool {
+        if case .loading = state { return true }
+        return false
+    }
+
+    var isLoadingMore: Bool {
+        if case .loadingMore = state { return true }
+        return false
+    }
+    
+    var errorMessage: String? {
+        if case .error(let message) = state { return message }
+        return nil
+    }
+    
+    var hasPerformedSearch: Bool {
+        if case .idle = state { return false }
+        return true
+    }
 
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
@@ -38,15 +72,6 @@ class SearchViewModel: ObservableObject {
 
     // MARK: - Initializer
     init() {
-        $searchTerm
-            .removeDuplicates()
-            .sink { [weak self] term in
-                if term.isEmpty {
-                    self?.resetSearch()
-                }
-            }
-            .store(in: &cancellables)
-
         let filterPublishers = Publishers.CombineLatest4($selectedSort, $selectedBoro, $selectedGrade, $selectedCuisine)
         
         filterPublishers
@@ -54,16 +79,23 @@ class SearchViewModel: ObservableObject {
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] _, _, _, _ in
                 guard let self = self, !self.searchTerm.isEmpty else { return }
-                Task {
-                    await self.performSearch()
-                }
+                Task { await self.performSearch() }
             }
             .store(in: &cancellables)
     }
     
-    // MARK: - Public Methods for Discovery
+    // MARK: - Public Methods
+    func performSearch() async {
+        await fetchRestaurants(isNewSearch: true)
+    }
+
+    func loadMoreContent() async {
+        await fetchRestaurants(isNewSearch: false)
+    }
+    
     func loadDiscoveryLists() async {
-        guard recentlyGradedRestaurants.isEmpty, !isLoadingDiscovery else { return }
+        if case .success = self.state { return }
+        guard !isLoadingDiscovery else { return }
         self.isLoadingDiscovery = true
         
         do {
@@ -77,93 +109,9 @@ class SearchViewModel: ObservableObject {
         self.isLoadingDiscovery = false
     }
 
-    // MARK: - Public Methods for Search
-    func performSearch() async {
-        guard !searchTerm.isEmpty else {
-            resetSearch()
-            return
-        }
-        
-        self.isLoading = true
-        self.errorMessage = nil
-
-        do {
-            let filters = apiFilterParameters()
-            
-            let newRestaurants = try await APIService.shared.searchRestaurants(
-                query: searchTerm,
-                page: 1,
-                perPage: perPage,
-                grade: filters.grade,
-                boro: filters.boro,
-                cuisine: filters.cuisine,
-                sort: filters.sort
-            )
-            
-            Analytics.logEvent("search_performed", parameters: [
-                           "search_term": searchTerm,
-                           "result_count": newRestaurants.count,
-                           "was_successful": true
-                       ])
-            
-            restaurants = newRestaurants
-            currentPage = 1
-            canLoadMorePages = newRestaurants.count == perPage
-            hasPerformedSearch = true
-
-        } catch {
-            errorMessage = (error as? APIError)?.description ?? "An unknown error occurred."
-            
-            Analytics.logEvent("search_performed", parameters: [
-                "search_term": searchTerm,
-                "was_successful": false,
-                "error_message": errorMessage ?? "unknown"
-            ])
-            
-            hasPerformedSearch = true
-        }
-        
-        isLoading = false
-    }
-
-    func loadMoreContent() async {
-        guard !isLoading, canLoadMorePages else { return }
-        
-        isLoading = true
-        currentPage += 1
-        
-        do {
-            let filters = apiFilterParameters()
-            
-            let newRestaurants = try await APIService.shared.searchRestaurants(
-                query: searchTerm,
-                page: currentPage,
-                perPage: perPage,
-                grade: filters.grade,
-                boro: filters.boro,
-                cuisine: filters.cuisine,
-                sort: filters.sort
-            )
-            
-            restaurants.append(contentsOf: newRestaurants)
-            canLoadMorePages = newRestaurants.count == perPage
-
-        } catch {
-            errorMessage = (error as? APIError)?.description
-            canLoadMorePages = false
-        }
-        
-        isLoading = false
-    }
-
-    @MainActor
     func resetSearch() {
         searchTerm = ""
-        restaurants = []
-        errorMessage = nil
-        isLoading = false
-        hasPerformedSearch = false
-        
+        state = .idle
         currentPage = 1
         canLoadMorePages = true
         
@@ -172,14 +120,58 @@ class SearchViewModel: ObservableObject {
         selectedGrade = .any
         selectedCuisine = .any
         
-        // --- THIS IS THE KEY UPDATE ---
-        // Change the ID to force the NavigationView to reset
         self.navigationID = UUID()
-        
         logger.info("Search state has been reset.")
     }
     
+    func logSeeAllRecentlyGradedTapped() {
+            Analytics.logEvent("view_recently_graded_all", parameters: nil)
+            logger.info("Analytics event logged: view_recently_graded_all")
+        }
+    
     // MARK: - Private Helpers
+    private func fetchRestaurants(isNewSearch: Bool) async {
+        guard !searchTerm.isEmpty else {
+            resetSearch()
+            return
+        }
+        
+        if !isNewSearch && (isLoading || !canLoadMorePages) { return }
+        
+        if isNewSearch {
+            state = .loading
+            currentPage = 1
+            canLoadMorePages = true
+        } else {
+            state = .loadingMore(restaurants)
+            currentPage += 1
+        }
+        
+        let filters = apiFilterParameters()
+        
+        do {
+            let newRestaurants = try await APIService.shared.searchRestaurants(
+                query: searchTerm, page: currentPage, perPage: perPage,
+                grade: filters.grade, boro: filters.boro, cuisine: filters.cuisine, sort: filters.sort
+            )
+            
+            let allRestaurants = isNewSearch ? newRestaurants : (restaurants + newRestaurants)
+            state = .success(allRestaurants)
+            
+            if isNewSearch {
+                Analytics.logEvent("search_performed", parameters: ["search_term": searchTerm, "result_count": newRestaurants.count])
+            }
+            
+            canLoadMorePages = newRestaurants.count == perPage
+            
+        } catch {
+            let errorMessage = (error as? APIError)?.description ?? "An unknown error occurred."
+            state = .error(errorMessage)
+            canLoadMorePages = false
+            Analytics.logEvent("search_error", parameters: ["search_term": searchTerm, "error_message": errorMessage])
+        }
+    }
+    
     private func apiFilterParameters() -> (sort: String?, grade: String?, boro: String?, cuisine: String?) {
         let sortValue = (selectedSort == .relevance) ? nil : selectedSort.rawValue
         let gradeValue = (selectedGrade == .any) ? nil : selectedGrade.rawValue
