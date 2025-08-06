@@ -15,6 +15,8 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let longitude: Double?
     let cuisine_description: String?
     let grade_date: String?
+    let foursquare_fsq_id: String? // ADDED
+    let google_place_id: String?   // ADDED
     let inspections: [Inspection]?
 
     var id: String { camis ?? UUID().uuidString }
@@ -80,7 +82,7 @@ struct Inspection: Identifiable, Codable, Equatable {
     var formattedDate: String { DateHelper.formatDate(inspection_date) }
     var hasCriticalViolations: Bool { critical_flag?.lowercased() == "critical" }
     
-    // --- NEW COMPUTED PROPERTIES ADDED HERE ---
+
     var displayGradeText: String {
         guard let grade = self.grade, !grade.isEmpty else {
             return "Not Graded"

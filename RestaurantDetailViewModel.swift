@@ -6,6 +6,9 @@ import FirebaseAnalytics
 
 @MainActor
 class RestaurantDetailViewModel: ObservableObject {
+    enum ExternalPlatform: String {
+        case google, yelp
+    }
     let restaurant: Restaurant
     let name: String
     let formattedAddress: String
@@ -73,6 +76,24 @@ class RestaurantDetailViewModel: ObservableObject {
             "restaurant_boro": self.restaurant.boro ?? "N/A"
         ])
     }
+    
+    func handleGoogleLink() {
+            // 1. Ensure we have the required data from the Restaurant model.
+            guard let placeID = restaurant.google_place_id,
+                  let placeName = restaurant.dba else {
+                logger.warning("Google link tapped, but google_place_id or dba name is missing.")
+                return
+            }
+            
+            // 2. Log the analytics event.
+            Analytics.logEvent("tap_external_link", parameters: [
+                "platform": "google",
+                "restaurant_id": restaurant.camis ?? "unknown"
+            ])
+            
+            // 3. Call our new GoogleMapsDeepLinker to handle the link.
+            GoogleMapsDeepLinker.openGoogleMaps(for: placeID, placeName: placeName)
+        }
     
     func formattedGrade(_ gradeCode: String?) -> String {
         guard let grade = gradeCode, !grade.isEmpty else { return "Not Graded" }

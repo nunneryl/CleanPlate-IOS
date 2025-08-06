@@ -35,6 +35,7 @@
 		32D9DA852CBDFB7900BA92E1 /* NYCFoodRatingsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D9DA842CBDFB7900BA92E1 /* NYCFoodRatingsUITestsLaunchTests.swift */; };
 		32DB85152E0F364C00CCE5D5 /* StaticMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */; };
 		32DB85172E0F373B00CCE5D5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32DB85162E0F373B00CCE5D5 /* MapKit.framework */; };
+		32EAB0BD2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32EAB0BC2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift */; };
 		32FC37DD2E1A033E00E72886 /* RecentlyGradedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */; };
 		32FC37DF2E1A056200E72886 /* RecentlyGradedListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */; };
 		32FC37E12E1DB32C00E72886 /* PreviewMockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */; };
@@ -90,6 +91,7 @@
 		32D9DA922CBDFDBB00BA92E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticMapView.swift; sourceTree = "<group>"; };
 		32DB85162E0F373B00CCE5D5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		32EAB0BC2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapsDeepLinker.swift; sourceTree = "<group>"; };
 		32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyGradedListView.swift; sourceTree = "<group>"; };
 		32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyGradedListViewModel.swift; sourceTree = "<group>"; };
 		32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMockData.swift; sourceTree = "<group>"; };
@@ -137,28 +139,29 @@
 			isa = PBXGroup;
 			children = (
 				329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */,
-				3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */,
-				32C138B82D8F66CF006F4121 /* MainTabView.swift */,
-				32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */,
-				32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */,
 				32C138BF2D8F67E2006F4121 /* AboutView.swift */,
+				32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */,
+				3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */,
+				32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */,
+				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
+				32C138C42D8F67E2006F4121 /* Models.swift */,
+				32EAB0BC2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift */,
+				32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */,
+				32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */,
 				32C138C02D8F67E2006F4121 /* APIService.swift */,
 				32C138C22D8F67E2006F4121 /* FAQView.swift */,
+				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
 				32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */,
-				32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */,
-				32C138D32D905217006F4121 /* ViolationsView.swift */,
-				32C138C42D8F67E2006F4121 /* Models.swift */,
+				32C138B82D8F66CF006F4121 /* MainTabView.swift */,
+				32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */,
 				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
-				32FC37E22E215C2900E72886 /* RestaurantDetailViewModel.swift */,
 				32FC37E42E25951400E72886 /* ReportIssueView.swift */,
 				32C138C62D8F67E2006F4121 /* SearchView.swift */,
-				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
-				32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */,
-				32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */,
-				32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */,
-				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
-				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
 				32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */,
+				32C138D32D905217006F4121 /* ViolationsView.swift */,
+				32FC37E22E215C2900E72886 /* RestaurantDetailViewModel.swift */,
+				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
+				32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */,
 				32D9DA662CBDFB7200BA92E1 /* CleanPlate */,
 				32D9DA772CBDFB7900BA92E1 /* NYCFoodRatingsTests */,
 				32D9DA812CBDFB7900BA92E1 /* NYCFoodRatingsUITests */,
@@ -367,6 +370,7 @@
 				32FC37E12E1DB32C00E72886 /* PreviewMockData.swift in Sources */,
 				32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */,
 				32C138CF2D8F67E2006F4121 /* Models.swift in Sources */,
+				32EAB0BD2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift in Sources */,
 				32C138D02D8F67E2006F4121 /* FAQView.swift in Sources */,
 				32FC37E52E25951500E72886 /* ReportIssueView.swift in Sources */,
 				32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */,
@@ -537,7 +541,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -555,7 +559,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -575,7 +579,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -593,7 +597,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

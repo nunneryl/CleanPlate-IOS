@@ -52,50 +52,82 @@ struct RestaurantDetailView: View {
     }
 
     private var headerSection: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.name)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                Text(viewModel.formattedAddress)
-                    .font(.system(size: 16, weight: .regular, design: .rounded))
-                    .foregroundColor(.secondary)
-                if let cuisine = viewModel.cuisine {
-                    Text(cuisine)
-                        .font(.system(size: 14, weight: .regular, design: .rounded))
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(viewModel.name)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                    
+                    Text(viewModel.formattedAddress)
+                        .font(.system(size: 16, weight: .regular, design: .rounded))
                         .foregroundColor(.secondary)
+                    
+                    if let cuisine = viewModel.cuisine {
+                        Text(cuisine)
+                            .font(.system(size: 14, weight: .regular, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
                 }
+                
+                Spacer()
+                
+                Image(viewModel.headerStatus.imageName)
+                    .resizable().scaledToFit().frame(width: 72, height: 72)
             }
-            Spacer()
-            Image(viewModel.headerStatus.imageName)
-                .resizable().scaledToFit().frame(width: 72, height: 72)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
-    }
 
     @ViewBuilder
-    private var mapSection: some View {
-        if let lat = viewModel.restaurant.latitude, let lon = viewModel.restaurant.longitude {
-            VStack(spacing: 12) {
-                Button(action: {
-                    HapticsManager.shared.impact(style: .light)
-                    withAnimation(.easeInOut) { isMapVisible.toggle() }
-                }) {
-                    HStack {
-                        Text(isMapVisible ? "Hide Map" : "Show Map")
-                        Image(systemName: isMapVisible ? "chevron.up" : "chevron.down")
+        private var mapSection: some View {
+            if let lat = viewModel.restaurant.latitude, let lon = viewModel.restaurant.longitude {
+                VStack(spacing: 12) {
+                    Button(action: {
+                        HapticsManager.shared.impact(style: .light)
+                        withAnimation(.easeInOut) { isMapVisible.toggle() }
+                    }) {
+                        HStack {
+                            Text(isMapVisible ? "Hide Map" : "Show Map")
+                            Image(systemName: isMapVisible ? "chevron.up" : "chevron.down")
+                        }
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
                     }
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                }
-                .buttonStyle(.bordered).tint(.blue)
+                    .buttonStyle(.bordered).tint(.blue)
 
-                if isMapVisible {
-                    StaticMapView(latitude: lat, longitude: lon, restaurantName: viewModel.name)
+                    if isMapVisible {
+                        VStack(spacing: 0) {
+                            StaticMapView(latitude: lat, longitude: lon, restaurantName: viewModel.name)
+                            
+                            // MOVED GOOGLE BUTTON HERE
+                            if viewModel.restaurant.google_place_id != nil {
+                                Button(action: {
+                                    viewModel.handleGoogleLink()
+                                }) {
+                                    HStack(spacing: 12) {
+                                        Image("logo_google")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 24, height: 24)
+                                        
+                                        Text("View on Google Maps")
+                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: "arrow.up.forward.app.fill")
+                                            .foregroundColor(Color(uiColor: .tertiaryLabel))
+                                    }
+                                    .padding()
+                                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                }
+                                .foregroundColor(.primary)
+                            }
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                         .padding(.horizontal)
                         .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
+                    }
                 }
             }
         }
-    }
     
     private var inspectionList: some View {
         VStack(alignment: .leading, spacing: 12) {
