@@ -35,18 +35,21 @@ enum GradeOption: String, CaseIterable, Identifiable {
     case b = "B"
     case c = "C"
     case pending = "P"
+    case closed = "Closed"
     var id: Self { self }
     
     var displayName: String {
         switch self {
-        case .any: "Any"
+        case .any: "Any Grade"
         case .a: "Grade A"
         case .b: "Grade B"
         case .c: "Grade C"
         case .pending: "Grade Pending"
+        case .closed: "Closed by DOHMH" // New Display Name
         }
     }
 }
+
 
 enum CuisineOption: String, CaseIterable, Identifiable {
     case any = "Any"

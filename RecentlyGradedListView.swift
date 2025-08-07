@@ -6,19 +6,19 @@ struct RecentlyGradedListView: View {
     @StateObject private var viewModel = RecentlyGradedListViewModel()
     
     init() {}
-
+    
     var body: some View {
         VStack {
             switch viewModel.state {
             case .loading:
                 ProgressView("Loading...")
                     .frame(maxHeight: .infinity)
-            
+                
             case .error(let errorMessage):
                 Text(errorMessage)
                     .foregroundColor(.secondary)
                     .frame(maxHeight: .infinity)
-            
+                
             case .success:
                 restaurantList
             }
@@ -29,7 +29,6 @@ struct RecentlyGradedListView: View {
         }
     }
     
-    // The main list view content, extracted for clarity
     private var restaurantList: some View {
         Form {
             Section(header: Text("Filters")) {
@@ -37,7 +36,10 @@ struct RecentlyGradedListView: View {
                     ForEach(BoroOption.allCases) { boro in Text(boro.rawValue).tag(boro) }
                 }
                 Picker("Grade", selection: $viewModel.gradeFilter) {
-                    ForEach([GradeOption.any, .a, .b, .c], id: \.self) { grade in Text(grade.rawValue).tag(grade) }
+                    // MODIFIED: This now includes all grade options
+                    ForEach(GradeOption.allCases) { grade in
+                        Text(grade.displayName).tag(grade)
+                    }
                 }
             }
             

@@ -18,6 +18,8 @@ class RecentlyGradedListViewModel: ObservableObject {
     @Published var gradeFilter: GradeOption = .any
     @Published var sortOption: SortOption = .dateDesc
 
+    // In file: RecentlyGradedListViewModel.swift
+
     var filteredRestaurants: [Restaurant] {
         guard case .success(let restaurants) = state else {
             return []
@@ -31,10 +33,30 @@ class RecentlyGradedListViewModel: ObservableObject {
         }
         
         if gradeFilter != .any {
-            processedList = processedList.filter { $0.latestFinalGrade == gradeFilter.rawValue }
+            processedList = processedList.filter { restaurant in
+                // Get the true most recent inspection for the restaurant
+                guard let latestInspection = restaurant.inspections?.sorted(by: { $0.inspection_date ?? "" > $1.inspection_date ?? "" }).first else {
+                    return false
+                }
+                
+                let latestGrade = latestInspection.grade ?? ""
+
+                switch gradeFilter {
+                case .closed:
+                    // Check if the latest action was a closure
+                    return latestInspection.action?.lowercased().contains("closed by dohmh") == true
+                case .pending:
+                    // Check for pending grades
+                    return latestGrade == "P" || latestGrade == "Z"
+                case .any:
+                    return true
+                case .a, .b, .c:
+                    return latestGrade == gradeFilter.rawValue
+                }
+            }
         }
         
-        // Sorting Logic
+        // Sorting Logic (remains unchanged)
         switch sortOption {
         case .nameAsc:
             processedList.sort { ($0.dba ?? "") < ($1.dba ?? "") }
