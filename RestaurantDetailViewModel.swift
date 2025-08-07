@@ -20,19 +20,22 @@ class RestaurantDetailViewModel: ObservableObject {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "RestaurantDetailViewModel")
 
     init(restaurant: Restaurant) {
-        self.restaurant = restaurant
-        self.name = restaurant.dba ?? "Restaurant Name"
-        self.formattedAddress = Self.formatAddress(for: restaurant)
-        let status = Self.calculateCurrentDisplayStatus(for: restaurant)
-        self.cuisine = restaurant.cuisine_description == "N/A" ? nil : restaurant.cuisine_description
-        self.headerStatus = (imageName: Self.gradeImageName(for: status), text: status)
-        self.shareableText = Self.buildShareableText(name: self.name, status: status)
-        self.addressURL = Self.buildAddressURL(from: self.formattedAddress)
-        self.inspections = restaurant.inspections?.sorted {
-            guard let date1 = $0.inspection_date, let date2 = $1.inspection_date else { return false }
-            return date1 > date2
-        } ?? []
-    }
+            self.restaurant = restaurant
+            self.name = restaurant.dba ?? "Restaurant Name"
+            self.formattedAddress = Self.formatAddress(for: restaurant)
+            let status = Self.calculateCurrentDisplayStatus(for: restaurant)
+            self.cuisine = restaurant.cuisine_description == "N/A" ? nil : restaurant.cuisine_description
+            self.headerStatus = (imageName: Self.gradeImageName(for: status), text: status)
+            self.shareableText = Self.buildShareableText(name: self.name, status: status)
+            self.addressURL = Self.buildAddressURL(from: self.formattedAddress)
+            self.inspections = restaurant.inspections?.sorted {
+                guard let dateStr1 = $0.inspection_date, let dateStr2 = $1.inspection_date,
+                      let date1 = DateHelper.parseDate(dateStr1), let date2 = DateHelper.parseDate(dateStr2) else {
+                    return false
+                }
+                return date1 > date2
+            } ?? []
+        }
     
     func submitReport(issueType: ReportIssueView.IssueType, comments: String) {
         guard let camis = self.restaurant.camis else {
@@ -122,16 +125,44 @@ class RestaurantDetailViewModel: ObservableObject {
     }
     
     private static func calculateCurrentDisplayStatus(for restaurant: Restaurant) -> String {
+        // 1. Get the latest inspection from the already sorted list.
         let sortedInspections = restaurant.inspections?.sorted(by: {
-            guard let date1 = $0.inspection_date, let date2 = $1.inspection_date else { return false }
+            guard let dateStr1 = $0.inspection_date, let dateStr2 = $1.inspection_date,
+                  let date1 = DateHelper.parseDate(dateStr1), let date2 = DateHelper.parseDate(dateStr2) else {
+                return false
+            }
             return date1 > date2
         }) ?? []
-        guard let latestInspection = sortedInspections.first else { return "Not_Graded" }
-        if let action = latestInspection.action?.lowercased(), action.contains("closed by dohmh") { return "Closed" }
-        if let grade = latestInspection.grade, ["Z", "P"].contains(grade) { return "Grade_Pending" }
-        if let graded = sortedInspections.first(where: { ["A", "B", "C"].contains($0.grade ?? "") }) { return graded.grade ?? "Grade_Pending" }
-        if sortedInspections.contains(where: { $0.grade == "N" }) == true { return "Not_Graded" }
-        return "Grade_Pending"
+
+        guard let latestInspection = sortedInspections.first else {
+            // This means the restaurant has no inspection records at all.
+            return "Not_Graded"
+        }
+
+        // 2. HIGHEST PRIORITY: Check if the latest inspection resulted in a closure.
+        // This check must come first, as it overrides any grade.
+        if let action = latestInspection.action?.lowercased(), action.contains("closed by dohmh") {
+            return "Closed"
+        }
+
+        // 3. If not closed, determine the status based on the LATEST inspection's grade.
+        if let grade = latestInspection.grade {
+            switch grade {
+            case "A", "B", "C":
+                return grade // Returns the letter grade directly (e.g., "A")
+            case "Z", "P":
+                return "Grade_Pending"
+            case "N":
+                return "Not_Graded"
+            default:
+                // For any other unexpected grade value, we'll default to pending.
+                return "Grade_Pending"
+            }
+        } else {
+            // If the latest inspection has no grade assigned (is nil or empty),
+            // it's considered "Grade Pending".
+            return "Grade_Pending"
+        }
     }
 
     private static func gradeImageName(for status: String) -> String {

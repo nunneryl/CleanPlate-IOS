@@ -15,8 +15,8 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let longitude: Double?
     let cuisine_description: String?
     let grade_date: String?
-    let foursquare_fsq_id: String? // ADDED
-    let google_place_id: String?   // ADDED
+    let foursquare_fsq_id: String?
+    let google_place_id: String?
     let inspections: [Inspection]?
 
     var id: String { camis ?? UUID().uuidString }
@@ -125,7 +125,8 @@ struct DateHelper {
     static func parseDate(_ dateStr: String?) -> Date? {
         guard let dateStr = dateStr else { return nil }
         let formatter = DateFormatter()
-        for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "E, dd MMM yyyy HH:mm:ss z"] {
+        // CORRECTED: Added the "MM/dd/yyyy" format to the list of formats to try.
+        for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "MM/dd/yyyy", "yyyy-MM-dd", "E, dd MMM yyyy HH:mm:ss z"] {
             formatter.dateFormat = dateFormat
             if let date = formatter.date(from: dateStr) {
                 return date
