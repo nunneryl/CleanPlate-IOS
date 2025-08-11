@@ -1,6 +1,3 @@
-//
-//  APIService.swift
-//
 
 import Foundation
 import os
@@ -70,6 +67,31 @@ class APIService {
             URLQueryItem(name: "limit", value: String(limit))
         ]
         return try await buildAndPerformRequest(path: "/lists/recently-graded", queryItems: queryItems)
+    }
+    
+    func fetchRestaurantDetails(camis: String) async throws -> Restaurant {
+        // Using self.baseURL for consistency
+        guard let url = URL(string: "\(self.baseURL)/restaurant/\(camis)") else {
+            throw APIError.invalidURL
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.unknown
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            // Corrected to throw a valid server error
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+        
+        do {
+            let restaurant = try JSONDecoder().decode(Restaurant.self, from: data)
+            return restaurant
+        } catch {
+            throw APIError.decodingError(error)
+        }
     }
     
     func submitReport(camis: String, issueType: String, comments: String) async throws {

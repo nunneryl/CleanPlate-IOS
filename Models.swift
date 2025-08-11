@@ -135,7 +135,6 @@ struct DateHelper {
         return nil
     }
 }
-
 extension Restaurant {
     var latestFinalGrade: String? {
         return inspections?
@@ -144,6 +143,16 @@ extension Restaurant {
                 return date1 > date2
             }
             .first { ["A", "B", "C"].contains($0.grade ?? "") }?
+            .grade
+    }
+    
+    var mostRecentInspectionGrade: String? {
+        return inspections?
+            .sorted {
+                guard let date1 = $0.inspection_date, let date2 = $1.inspection_date else { return false }
+                return date1 > date2
+            }
+            .first?
             .grade
     }
 }

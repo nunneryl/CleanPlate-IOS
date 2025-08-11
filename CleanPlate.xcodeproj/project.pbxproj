@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */; };
+		323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323C1CC62E4A722700EB2E2A /* ShareSheet.swift */; };
 		326C9E872DC6A6EB007457E4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 326C9E862DC6A6EB007457E4 /* FirebaseCrashlytics */; };
 		32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */; };
 		32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */; };
@@ -62,6 +63,7 @@
 
 /* Begin PBXFileReference section */
 		3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsLogger.swift; sourceTree = "<group>"; };
+		323C1CC62E4A722700EB2E2A /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
 		32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManager.swift; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 		32D9DA5B2CBDFB7100BA92E1 = {
 			isa = PBXGroup;
 			children = (
+				323C1CC62E4A722700EB2E2A /* ShareSheet.swift */,
 				329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */,
 				32C138BF2D8F67E2006F4121 /* AboutView.swift */,
 				32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */,
@@ -361,6 +364,7 @@
 				3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */,
 				32C138CA2D8F67E2006F4121 /* AboutView.swift in Sources */,
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
+				323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */,
 				32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */,
 				32C138D42D905217006F4121 /* ViolationsView.swift in Sources */,
 				32C138CC2D8F67E2006F4121 /* APIService.swift in Sources */,
@@ -541,7 +545,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -579,7 +583,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;

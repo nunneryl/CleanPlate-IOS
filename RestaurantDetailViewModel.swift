@@ -6,40 +6,45 @@ import FirebaseAnalytics
 
 @MainActor
 class RestaurantDetailViewModel: ObservableObject {
-    enum ExternalPlatform: String {
-        case google, yelp
+    
+    // State management for loading full details
+    enum DetailState {
+        case partial(Restaurant)
+        case full(Restaurant)
+        case error(String)
     }
-    let restaurant: Restaurant
-    let name: String
-    let formattedAddress: String
-    let cuisine: String?
-    let shareableText: String
-    let addressURL: URL?
-    let inspections: [Inspection]
-    let headerStatus: (imageName: String, text: String)
+    
+    @Published var state: DetailState
+    
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "RestaurantDetailViewModel")
 
+    // Initialize with the partial data so the screen isn't blank
     init(restaurant: Restaurant) {
-            self.restaurant = restaurant
-            self.name = restaurant.dba ?? "Restaurant Name"
-            self.formattedAddress = Self.formatAddress(for: restaurant)
-            let status = Self.calculateCurrentDisplayStatus(for: restaurant)
-            self.cuisine = restaurant.cuisine_description == "N/A" ? nil : restaurant.cuisine_description
-            self.headerStatus = (imageName: Self.gradeImageName(for: status), text: status)
-            self.shareableText = Self.buildShareableText(name: self.name, status: status)
-            self.addressURL = Self.buildAddressURL(from: self.formattedAddress)
-            self.inspections = restaurant.inspections?.sorted {
-                guard let dateStr1 = $0.inspection_date, let dateStr2 = $1.inspection_date,
-                      let date1 = DateHelper.parseDate(dateStr1), let date2 = DateHelper.parseDate(dateStr2) else {
-                    return false
-                }
-                return date1 > date2
-            } ?? []
-        }
+        self.state = .partial(restaurant)
+    }
     
-    func submitReport(issueType: ReportIssueView.IssueType, comments: String) {
-        guard let camis = self.restaurant.camis else {
-            // This logger is from the class scope, it should be available
+    // Function to load the full details
+    func loadFullDetailsIfNeeded() async {
+        guard case .partial(let partialRestaurant) = state, let camis = partialRestaurant.camis else {
+            // If we are not in the partial state, or have no camis, do nothing.
+            return
+        }
+        
+        do {
+            logger.info("Fetching full details for CAMIS \(camis, privacy: .public)")
+            let fullRestaurantDetails = try await APIService.shared.fetchRestaurantDetails(camis: camis)
+            self.state = .full(fullRestaurantDetails)
+            logger.info("Successfully fetched full details.")
+        } catch {
+            let apiError = error as? APIError ?? .unknown
+            self.state = .error(apiError.description)
+            logger.error("Failed to load full details for CAMIS \(camis, privacy: .public): \(apiError.description, privacy: .public)")
+        }
+    }
+    
+    // The report submission logic can stay here as it's a business logic task.
+    func submitReport(for restaurant: Restaurant, issueType: ReportIssueView.IssueType, comments: String) {
+        guard let camis = restaurant.camis else {
             logger.error("Cannot submit report, restaurant CAMIS is missing.")
             return
         }
@@ -54,142 +59,15 @@ class RestaurantDetailViewModel: ObservableObject {
                     comments: comments
                 )
                 logger.info("Report submission successful.")
-                
-                // Log the successful submission to Firebase
                 Analytics.logEvent("submit_issue_report", parameters: [
                     "issue_type": issueType.rawValue,
                     "has_comments": !comments.isEmpty,
-                    AnalyticsParameterItemID: camis // Using standard Firebase parameter
+                    AnalyticsParameterItemID: camis
                 ])
                 
             } catch {
                 logger.error("Report submission failed: \(error.localizedDescription, privacy: .public)")
             }
         }
-    }
-
-    
-    func onAppear() {
-        // ReviewManager.shared.requestReviewIfAppropriate()
-        logger.info("RestaurantDetailView appeared for \(self.name)")
-        Analytics.logEvent(AnalyticsEventViewItem, parameters: [
-            AnalyticsParameterItemID: self.restaurant.camis ?? "unknown",
-            AnalyticsParameterItemName: self.name,
-            AnalyticsParameterItemCategory: self.restaurant.cuisine_description ?? "N/A",
-            "restaurant_boro": self.restaurant.boro ?? "N/A"
-        ])
-    }
-    
-    func handleGoogleLink() {
-            // 1. Ensure we have the required data from the Restaurant model.
-            guard let placeID = restaurant.google_place_id,
-                  let placeName = restaurant.dba else {
-                logger.warning("Google link tapped, but google_place_id or dba name is missing.")
-                return
-            }
-            
-            // 2. Log the analytics event.
-            Analytics.logEvent("tap_external_link", parameters: [
-                "platform": "google",
-                "restaurant_id": restaurant.camis ?? "unknown"
-            ])
-            
-            // 3. Call our new GoogleMapsDeepLinker to handle the link.
-            GoogleMapsDeepLinker.openGoogleMaps(for: placeID, placeName: placeName)
-        }
-    
-    func formattedGrade(_ gradeCode: String?) -> String {
-        guard let grade = gradeCode, !grade.isEmpty else { return "Not Graded" }
-        switch grade {
-        case "A", "B", "C": return "Grade \(grade)"
-        case "Z": return "Grade Pending"
-        case "P": return "Grade Pending (Re-opening)"
-        case "N": return "Not Yet Graded"
-        default: return "N/A"
-        }
-    }
-
-    func gradeColor(for grade: String) -> Color {
-        switch grade {
-        case "A": return .blue
-        case "B": return .green
-        case "C": return .orange
-        case "Z", "P", "N": return .gray
-        default: return .gray
-        }
-    }
-
-    private static func formatAddress(for restaurant: Restaurant) -> String {
-        [restaurant.building, restaurant.street, restaurant.boro, restaurant.zipcode]
-            .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
-    }
-    
-    private static func calculateCurrentDisplayStatus(for restaurant: Restaurant) -> String {
-        // 1. Get the latest inspection from the already sorted list.
-        let sortedInspections = restaurant.inspections?.sorted(by: {
-            guard let dateStr1 = $0.inspection_date, let dateStr2 = $1.inspection_date,
-                  let date1 = DateHelper.parseDate(dateStr1), let date2 = DateHelper.parseDate(dateStr2) else {
-                return false
-            }
-            return date1 > date2
-        }) ?? []
-
-        guard let latestInspection = sortedInspections.first else {
-            // This means the restaurant has no inspection records at all.
-            return "Not_Graded"
-        }
-
-        // 2. HIGHEST PRIORITY: Check if the latest inspection resulted in a closure.
-        // This check must come first, as it overrides any grade.
-        if let action = latestInspection.action?.lowercased(), action.contains("closed by dohmh") {
-            return "Closed"
-        }
-
-        // 3. If not closed, determine the status based on the LATEST inspection's grade.
-        if let grade = latestInspection.grade {
-            switch grade {
-            case "A", "B", "C":
-                return grade // Returns the letter grade directly (e.g., "A")
-            case "Z", "P":
-                return "Grade_Pending"
-            case "N":
-                return "Not_Graded"
-            default:
-                // For any other unexpected grade value, we'll default to pending.
-                return "Grade_Pending"
-            }
-        } else {
-            // If the latest inspection has no grade assigned (is nil or empty),
-            // it's considered "Grade Pending".
-            return "Grade_Pending"
-        }
-    }
-
-    private static func gradeImageName(for status: String) -> String {
-        switch status {
-        case "A": return "Grade_A"
-        case "B": return "Grade_B"
-        case "C": return "Grade_C"
-        case "Grade_Pending": return "Grade_Pending"
-        case "Closed": return "closed_down"
-        default: return "Not_Graded"
-        }
-    }
-    
-    private static func buildShareableText(name: String, status: String) -> String {
-        let appStoreLink = "Download CleanPlate to search for any restaurant in NYC: https://apps.apple.com/us/app/cleanplate-nyc/id6745222863"
-        let statusText: String
-        switch status {
-        case "A", "B", "C": statusText = "a New York City Department of Health Restaurant Inspection Grade \(status)"
-        case "Grade_Pending": statusText = "a Grade Pending status"
-        case "Closed": statusText = "a Closed by DOHMH status"
-        default: statusText = "a 'Not Graded' status"
-        }
-        return "Here's the latest NYC health grade for \(name) via the CleanPlate app:\n\nIt currently has \(statusText).\n\nNew to CleanPlate? \(appStoreLink)"
-    }
-    
-    private static func buildAddressURL(from address: String) -> URL? {
-        guard let encodedAddress = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return nil }
-        return URL(string: "http://maps.apple.com/?q=\(encodedAddress)")
     }
 }

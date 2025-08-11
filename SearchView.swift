@@ -28,7 +28,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Discovery Card View
+// MARK: - Discovery Card View (UPDATED)
 struct DiscoveryCardView: View {
     let restaurant: Restaurant
 
@@ -54,12 +54,9 @@ struct DiscoveryCardView: View {
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                 Spacer()
-                if let grade = restaurant.latestFinalGrade {
-                    Image("Grade_\(grade)")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28, height: 28)
-                }
+                
+                // This now calls the new helper function with the correct grade property
+                gradeIcon(for: restaurant.mostRecentInspectionGrade)
             }
         }
         .frame(width: 160, height: 100)
@@ -67,6 +64,30 @@ struct DiscoveryCardView: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
         .shadow(color: .gray.opacity(0.15), radius: 4, x: 0, y: 2)
+    }
+
+    @ViewBuilder
+    private func gradeIcon(for grade: String?) -> some View {
+        switch grade?.uppercased() {
+        case "A", "B", "C":
+            if let grade = grade {
+                Image("Grade_\(grade.uppercased())")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
+            }
+        case "P", "Z", "GRADE PENDING":
+            Image("Grade_Pending")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 28, height: 28)
+        default:
+            Image(systemName: "questionmark.circle")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 28, height: 28)
+                .foregroundColor(.secondary)
+        }
     }
 }
 
