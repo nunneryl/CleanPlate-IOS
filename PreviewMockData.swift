@@ -1,4 +1,4 @@
-// MARK: - UPDATED FILE: PreviewMockData.swift
+// In file: PreviewMockData.swift
 
 import Foundation
 
@@ -20,7 +20,9 @@ struct PreviewMockData {
             latitude: 40.8560,
             longitude: -73.8837,
             cuisine_description: "Pizza",
-            grade_date: "2025-07-08", // CHANGED
+            grade_date: "2025-07-08",
+            foursquare_fsq_id: nil, // <-- ADDED
+            google_place_id: nil,   // <-- ADDED
             inspections: [
                 Inspection(inspection_date: "2025-07-08T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ]
@@ -37,7 +39,9 @@ struct PreviewMockData {
             latitude: 40.7400,
             longitude: -74.0000,
             cuisine_description: "Cafe/Variety",
-            grade_date: "2025-07-07", // CHANGED
+            grade_date: "2025-07-07",
+            foursquare_fsq_id: nil, // <-- ADDED
+            google_place_id: nil,   // <-- ADDED
             inspections: [
                 Inspection(inspection_date: "2025-07-07T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: []),
                 Inspection(inspection_date: "2024-04-15T00:00:00", critical_flag: "Critical", grade: "B", inspection_type: "Cycle Inspection / Re-inspection", action: nil, violations: [
@@ -59,6 +63,8 @@ struct PreviewMockData {
             longitude: -73.9230,
             cuisine_description: "Tacos",
             grade_date: "2025-07-06",
+            foursquare_fsq_id: nil, // <-- ADDED
+            google_place_id: nil,   // <-- ADDED
             inspections: [
                 Inspection(inspection_date: "2025-07-06T00:00:00", critical_flag: "Not Critical", grade: "B", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ]
@@ -75,7 +81,9 @@ struct PreviewMockData {
             latitude: 40.7027,
             longitude: -73.9906,
             cuisine_description: "American Diner",
-            grade_date: "2025-07-05", // CHANGED
+            grade_date: "2025-07-05",
+            foursquare_fsq_id: nil, // <-- ADDED
+            google_place_id: nil,   // <-- ADDED
             inspections: [
                 Inspection(inspection_date: "2025-07-05T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [
                     Violation(violation_code: "08A", violation_description: "Facility not vermin proof."),
@@ -97,12 +105,12 @@ struct PreviewMockData {
             longitude: -73.9550,
             cuisine_description: "Steakhouse",
             grade_date: "2025-07-03",
+            foursquare_fsq_id: nil, // <-- ADDED
+            google_place_id: nil,   // <-- ADDED
             inspections: [
                 Inspection(inspection_date: "2025-07-03T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ]
         ),
-        // These restaurants will not appear in the "Recently Graded" list
-        // because they do not have a recent A, B, or C grade.
         Restaurant(
             camis: "33333333",
             dba: "Test Kitchen",
@@ -115,6 +123,8 @@ struct PreviewMockData {
             longitude: -73.9485,
             cuisine_description: "Fusion",
             grade_date: nil,
+            foursquare_fsq_id: nil, // <-- ADDED
+            google_place_id: nil,   // <-- ADDED
             inspections: []
         ),
         Restaurant(
@@ -129,6 +139,8 @@ struct PreviewMockData {
             longitude: -73.9815,
             cuisine_description: "New American",
             grade_date: nil,
+            foursquare_fsq_id: nil, // <-- ADDED
+            google_place_id: nil,   // <-- ADDED
             inspections: [
                 Inspection(inspection_date: "2025-06-25T00:00:00", critical_flag: "Not Applicable", grade: "N", inspection_type: "Pre-permit (Operational) / Initial Inspection", action: nil, violations: [])
             ]

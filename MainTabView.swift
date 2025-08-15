@@ -5,6 +5,7 @@ import SwiftUI
 extension Notification.Name {
     static let resetSearch = Notification.Name("resetSearch")
     static let switchToFoodSafetyTab = Notification.Name("switchToFoodSafetyTab")
+    static let switchToSearchTab = Notification.Name("switchToSearchTab")
 }
 
 struct MainTabView: View {
@@ -20,10 +21,8 @@ struct MainTabView: View {
                 HapticsManager.shared.impact(style: .light)
                 
                 if newTab == selectedTab && newTab == 0 {
-                    // If the home tab (0) is tapped while it's already selected...
                     searchViewModel.resetSearch()
                 }
-                // Always update the selected tab
                 selectedTab = newTab
             }
         )
@@ -46,15 +45,26 @@ struct MainTabView: View {
                 }
                 .tag(1)
             
+            ProfileView()
+                .tabItem {
+                    Image(systemName: "person.circle")
+                    Text("Profile")
+                }
+                .tag(2)
+            
             AboutView()
                 .tabItem {
                     Image(systemName: "info.circle")
                     Text("About")
                 }
-                .tag(2)
+                .tag(3) //
         }
         .onReceive(NotificationCenter.default.publisher(for: .switchToFoodSafetyTab)) { _ in
+            // Note: Food Safety is now tab 1
             self.selectedTab = 1
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .switchToSearchTab)) { _ in
+            self.selectedTab = 0
         }
     }
 }

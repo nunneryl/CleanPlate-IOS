@@ -10,6 +10,9 @@
 		3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */; };
 		323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323C1CC62E4A722700EB2E2A /* ShareSheet.swift */; };
 		326C9E872DC6A6EB007457E4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 326C9E862DC6A6EB007457E4 /* FirebaseCrashlytics */; };
+		32A22CA92E4BD6670077653F /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A22CA82E4BD6670077653F /* ProfileView.swift */; };
+		32A22CAB2E4BD8DD0077653F /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */; };
+		32A22CAF2E4BF80D0077653F /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A22CAE2E4BF80D0077653F /* KeychainHelper.swift */; };
 		32A4CAE52DF3C89E00CC8C37 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */; };
 		32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */; };
 		32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */; };
@@ -65,6 +68,9 @@
 		3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsLogger.swift; sourceTree = "<group>"; };
 		323C1CC62E4A722700EB2E2A /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		32A22CA82E4BD6670077653F /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
+		32A22CAE2E4BF80D0077653F /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
 		32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManager.swift; sourceTree = "<group>"; };
 		32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterOptions.swift; sourceTree = "<group>"; };
@@ -152,10 +158,13 @@
 				32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */,
 				32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */,
 				32C138C02D8F67E2006F4121 /* APIService.swift */,
+				32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */,
+				32A22CAE2E4BF80D0077653F /* KeychainHelper.swift */,
 				32C138C22D8F67E2006F4121 /* FAQView.swift */,
 				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
 				32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */,
 				32C138B82D8F66CF006F4121 /* MainTabView.swift */,
+				32A22CA82E4BD6670077653F /* ProfileView.swift */,
 				32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */,
 				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
 				32FC37E42E25951400E72886 /* ReportIssueView.swift */,
@@ -361,9 +370,12 @@
 				32FC37DF2E1A056200E72886 /* RecentlyGradedListViewModel.swift in Sources */,
 				32FC37E32E215C2A00E72886 /* RestaurantDetailViewModel.swift in Sources */,
 				32C138C92D8F67E2006F4121 /* SearchViewModel.swift in Sources */,
+				32A22CAF2E4BF80D0077653F /* KeychainHelper.swift in Sources */,
 				3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */,
 				32C138CA2D8F67E2006F4121 /* AboutView.swift in Sources */,
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
+				32A22CAB2E4BD8DD0077653F /* AuthenticationManager.swift in Sources */,
+				32A22CA92E4BD6670077653F /* ProfileView.swift in Sources */,
 				323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */,
 				32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */,
 				32C138D42D905217006F4121 /* ViolationsView.swift in Sources */,
@@ -545,7 +557,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -563,7 +575,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7.0;
+				MARKETING_VERSION = 2.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -583,7 +595,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -601,7 +613,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.7.0;
+				MARKETING_VERSION = 2.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

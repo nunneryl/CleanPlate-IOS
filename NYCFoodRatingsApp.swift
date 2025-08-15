@@ -1,16 +1,16 @@
+// In file: NYCFoodRatingsApp.swift
+
 import SwiftUI
 import os
-import FirebaseCore // <-- Import this
+import FirebaseCore
 
 @main
 struct NYCFoodRatingsApp: App {
+    @StateObject private var authManager = AuthenticationManager()
+    
     init() {
-        // --- Add Firebase Initialization HERE ---
-        FirebaseApp.configure() // <--- This is the only line needed for init
-        print("Firebase configured successfully!") // Optional confirmation
-        // --- End Firebase Initialization ---
-
-        // Your existing launch time logging
+        FirebaseApp.configure()
+        print("Firebase configured successfully!")
         let launchStart = Date()
         let elapsed = Date().timeIntervalSince(launchStart)
         os_log("App launch time: %.2f seconds", elapsed)
@@ -19,6 +19,8 @@ struct NYCFoodRatingsApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                // <<< NEW: Make the authManager available to all child views >>>
+                .environmentObject(authManager)
         }
     }
 }

@@ -51,13 +51,15 @@ extension RestaurantDetailViewModel.DetailState {
 
 // MARK: - Main Content View
 struct RestaurantContentView: View {
+    @EnvironmentObject var authManager: AuthenticationManager
     let restaurant: Restaurant
-    let isLoading: Bool // Receives loading state
+    let isLoading: Bool
     let submitReportAction: (ReportIssueView.IssueType, String) -> Void
 
     @State private var isShowingShareSheet = false
     @State private var isMapVisible = false
     @State private var isShowingReportSheet = false
+    @State private var isShowingSignInSheet = false //
     
     // All display logic is now here, pulled from the old ViewModel
     private var name: String { restaurant.dba ?? "Restaurant Name" }
@@ -87,11 +89,27 @@ struct RestaurantContentView: View {
         }
         .background(Color(UIColor.systemBackground).ignoresSafeArea())
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    self.isShowingShareSheet = true
-                }) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button(action: { self.isShowingShareSheet = true }) {
                     Image(systemName: "square.and.arrow.up")
+                }
+
+                // The heart button is now always visible
+                Button(action: {
+                    if case .signedIn = authManager.authState {
+                        if authManager.isFavorite(restaurant) {
+                            authManager.removeFavorite(restaurant)
+                        } else {
+                            authManager.addFavorite(restaurant)
+                        }
+                    } else {
+                        authManager.signIn {
+                            authManager.addFavorite(restaurant)
+                        }
+                    }
+                }) {
+                    Image(systemName: authManager.isFavorite(restaurant) ? "heart.fill" : "heart")
+                        .foregroundColor(.red)
                 }
             }
         }
@@ -102,6 +120,9 @@ struct RestaurantContentView: View {
             ReportIssueView { issueType, comments in
                 submitReportAction(issueType, comments)
             }
+        }
+        .sheet(isPresented: $isShowingSignInSheet) {
+            ProfileView()
         }
         .onAppear {
             Analytics.logEvent(AnalyticsEventViewItem, parameters: [

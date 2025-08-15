@@ -155,4 +155,34 @@ extension Restaurant {
             .first?
             .grade
     }
+    
+    var displayGradeImageName: String {
+        let sortedInspections = inspections?.sorted(by: {
+            guard let date1 = DateHelper.parseDate($0.inspection_date),
+                  let date2 = DateHelper.parseDate($1.inspection_date) else { return false }
+            return date1 > date2
+        }) ?? []
+        
+        guard let latestInspection = sortedInspections.first else {
+            return "Not_Graded"
+        }
+        
+        if let action = latestInspection.action?.lowercased(), action.contains("closed by dohmh") {
+            return "closed_down"
+        }
+        
+        if let grade = latestInspection.grade {
+            switch grade {
+            case "A": return "Grade_A"
+            case "B": return "Grade_B"
+            case "C": return "Grade_C"
+            case "Z", "P": return "Grade_Pending"
+            case "N": return "Not_Graded"
+            default: return "Grade_Pending" // Default to pending if grade is unusual
+            }
+        } else {
+            // If there's an inspection but no grade, it's considered pending.
+            return "Grade_Pending"
+        }
+    }
 }
