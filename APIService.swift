@@ -43,7 +43,7 @@ class APIService {
     
     private init() {}
     
-    private let baseURL = "https://cleanplate-production.up.railway.appd"
+    private let baseURL = "https://cleanplate-production.up.railway.app"
     
     // MARK: - Public API Methods
     
