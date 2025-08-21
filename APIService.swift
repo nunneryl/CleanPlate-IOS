@@ -29,10 +29,8 @@ enum APIError: Error {
     }
 }
 
-// Helper struct for handling empty JSON responses
 struct EmptyResponse: Decodable {}
 
-// <<< NEW: Helper to provide the auth token to the service >>>
 struct AuthTokenProvider {
     static var token: String?
 }
@@ -42,7 +40,6 @@ class APIService {
     static let shared = APIService()
     
     private init() {}
-    
     private let baseURL = "https://cleanplate-production.up.railway.app"
     
     // MARK: - Public API Methods
@@ -62,9 +59,12 @@ class APIService {
         return try await buildAndPerformRequest(path: "/search", queryItems: queryItems)
     }
     
-    func fetchRecentlyGraded(limit: Int) async throws -> [Restaurant] {
-        let queryItems = [URLQueryItem(name: "limit", value: String(limit))]
-        return try await buildAndPerformRequest(path: "/lists/recently-graded", queryItems: queryItems)
+    func fetchRecentlyGraded() async throws -> [Restaurant] {
+        return try await buildAndPerformRequest(path: "/lists/recently-graded")
+    }
+    
+    func fetchRecentActions() async throws -> RecentActionsResponse {
+        return try await buildAndPerformRequest(path: "/lists/recent-actions")
     }
     
     func fetchRestaurantDetails(camis: String) async throws -> Restaurant {
@@ -96,6 +96,19 @@ class APIService {
 
     func fetchFavorites(token: String) async throws -> [Restaurant] {
         return try await buildAndPerformRequest(path: "/favorites", method: "GET", token: token)
+    }
+    
+    func saveRecentSearch(searchTerm: String, token: String) async throws {
+        let body: [String: Any] = ["search_term": searchTerm]
+        let _: EmptyResponse = try await buildAndPerformRequest(path: "/recent-searches", method: "POST", body: body, token: token)
+    }
+    
+    func fetchRecentSearches(token: String) async throws -> [RecentSearch] {
+        return try await buildAndPerformRequest(path: "/recent-searches", method: "GET", token: token)
+    }
+
+    func clearRecentSearches(token: String) async throws {
+        let _: EmptyResponse = try await buildAndPerformRequest(path: "/recent-searches", method: "DELETE", token: token)
     }
     
     // MARK: - Private Helper Functions
@@ -131,6 +144,8 @@ class APIService {
         
         do {
             let decoder = JSONDecoder()
+            // This date decoding strategy is important for handling the format from PostgreSQL
+            decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode(T.self, from: data)
         } catch {
             logger.error("JSON decoding error from \(request.url?.absoluteString ?? "N/A", privacy: .public): \(error.localizedDescription, privacy: .public)")

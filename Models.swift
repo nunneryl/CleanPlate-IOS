@@ -114,6 +114,19 @@ struct Violation: Identifiable, Codable, Equatable {
     let violation_description: String?
 }
 
+struct RecentActionsResponse: Codable {
+    let recently_closed: [Restaurant]
+    let recently_reopened: [Restaurant]
+}
+
+// Represents a single recent search item returned from the API.
+struct RecentSearch: Codable, Identifiable, Equatable {
+    let id: Int
+    let search_term_display: String
+    let created_at: String
+}
+// --- END NEW ---
+
 struct DateHelper {
     static func formatDate(_ dateStr: String?) -> String {
         guard let dateStr = dateStr, let date = parseDate(dateStr) else { return "N/A" }
@@ -125,8 +138,7 @@ struct DateHelper {
     static func parseDate(_ dateStr: String?) -> Date? {
         guard let dateStr = dateStr else { return nil }
         let formatter = DateFormatter()
-        // CORRECTED: Added the "MM/dd/yyyy" format to the list of formats to try.
-        for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "MM/dd/yyyy", "yyyy-MM-dd", "E, dd MMM yyyy HH:mm:ss z"] {
+        for dateFormat in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", "MM/dd/yyyy", "yyyy-MM-dd", "E, dd MMM yyyy HH:mm:ss z"] {
             formatter.dateFormat = dateFormat
             if let date = formatter.date(from: dateStr) {
                 return date
@@ -178,10 +190,9 @@ extension Restaurant {
             case "C": return "Grade_C"
             case "Z", "P": return "Grade_Pending"
             case "N": return "Not_Graded"
-            default: return "Grade_Pending" // Default to pending if grade is unusual
+            default: return "Grade_Pending"
             }
         } else {
-            // If there's an inspection but no grade, it's considered pending.
             return "Grade_Pending"
         }
     }

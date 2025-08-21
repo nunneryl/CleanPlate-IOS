@@ -85,7 +85,7 @@ struct AboutView: View {
                         Image(systemName: "shield.lefthalf.filled")
                             .foregroundColor(.secondary)
                         
-                        Link("Privacy Policy", destination: URL(string: "https://cleanplate.support/privacy.html")!)
+                        Link("Privacy Policy, Terms and Conditions, Etc.", destination: URL(string: "https://cleanplate.support")!)
                         
                         Spacer()
                         

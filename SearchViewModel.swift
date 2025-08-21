@@ -26,9 +26,10 @@ class SearchViewModel: ObservableObject {
     @Published var selectedGrade: GradeOption = .any
     @Published var selectedCuisine: CuisineOption = .any
     
-    // MARK: - Discovery List Properties
+    // MARK: - Discovery & Recent Search Properties
     @Published var recentlyGradedRestaurants: [Restaurant] = []
     @Published var isLoadingDiscovery: Bool = false
+    @Published var recentSearches: [RecentSearch] = []
     
     // MARK: - Navigation & Pagination
     @Published var navigationID = UUID()
@@ -36,7 +37,7 @@ class SearchViewModel: ObservableObject {
     private var currentPage = 1
     private let perPage = 25
 
-    // MARK: - Computed Properties (for View compatibility)
+    // MARK: - Computed Properties
     var restaurants: [Restaurant] {
         switch state {
         case .success(let restaurants), .loadingMore(let restaurants):
@@ -72,17 +73,27 @@ class SearchViewModel: ObservableObject {
 
     // MARK: - Initializer
     init() {
-        let filterPublishers = Publishers.CombineLatest4($selectedSort, $selectedBoro, $selectedGrade, $selectedCuisine)
-        
-        filterPublishers
-            .dropFirst()
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { [weak self] _, _, _, _ in
-                guard let self = self, !self.searchTerm.isEmpty else { return }
-                Task { await self.performSearch() }
-            }
-            .store(in: &cancellables)
-    }
+           let filterPublishers = Publishers.CombineLatest4($selectedSort, $selectedBoro, $selectedGrade, $selectedCuisine)
+           
+           filterPublishers
+               .dropFirst()
+               .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+               .sink { [weak self] _, _, _, _ in
+                   guard let self = self, !self.searchTerm.isEmpty else { return }
+                   Task { await self.performSearch() }
+               }
+               .store(in: &cancellables)
+               
+           // Listen for the "clear" notification
+           NotificationCenter.default.publisher(for: .didClearRecentSearches)
+               .receive(on: DispatchQueue.main)
+               .sink { [weak self] _ in
+                   self?.recentSearches = []
+                   self?.logger.info("Cleared recent searches via notification.")
+               }
+               .store(in: &cancellables)
+       }
+
     
     // MARK: - Public Methods
     func performSearch() async {
@@ -93,41 +104,64 @@ class SearchViewModel: ObservableObject {
         await fetchRestaurants(isNewSearch: false)
     }
     
-    func loadDiscoveryLists() async {
+    func loadIdleScreenContent() async {
         if case .success = self.state { return }
         guard !isLoadingDiscovery else { return }
         self.isLoadingDiscovery = true
         
+        // Run both network calls in parallel for better performance
+        async let gradedTask = APIService.shared.fetchRecentlyGraded()
+        async let recentSearchesTask: () = self.fetchRecentSearches()
+        
         do {
-            let restaurants = try await APIService.shared.fetchRecentlyGraded(limit: 20)
+            let restaurants = try await gradedTask
             self.recentlyGradedRestaurants = restaurants
-            logger.info("Successfully loaded \(restaurants.count) recently graded restaurants for discovery.")
+            logger.info("Successfully loaded \(restaurants.count) recently graded restaurants.")
         } catch {
-            logger.error("Failed to load discovery lists: \(error.localizedDescription)")
+            logger.error("Failed to load recently graded list: \(error.localizedDescription)")
         }
+        
+        await recentSearchesTask // Await the result of the searches fetch
         
         self.isLoadingDiscovery = false
     }
 
     func resetSearch() {
-        searchTerm = ""
-        state = .idle
-        currentPage = 1
-        canLoadMorePages = true
-        
-        selectedSort = .relevance
-        selectedBoro = .any
-        selectedGrade = .any
-        selectedCuisine = .any
-        
-        self.navigationID = UUID()
-        logger.info("Search state has been reset.")
-    }
+            searchTerm = ""
+            state = .idle
+            currentPage = 1
+            canLoadMorePages = true
+            
+            selectedSort = .relevance
+            selectedBoro = .any
+            selectedGrade = .any
+            selectedCuisine = .any
+            
+            self.navigationID = UUID()
+            logger.info("Search state has been reset.")
+        }
     
     func logSeeAllRecentlyGradedTapped() {
             Analytics.logEvent("view_recently_graded_all", parameters: nil)
             logger.info("Analytics event logged: view_recently_graded_all")
         }
+    
+    // --- NEW: Dedicated function to fetch recent searches ---
+    func fetchRecentSearches() async {
+        guard let token = AuthTokenProvider.token else {
+            self.recentSearches = [] // Clear searches if user is logged out
+            return
+        }
+        
+        do {
+            let searches = try await APIService.shared.fetchRecentSearches(token: token)
+            self.recentSearches = searches
+            logger.info("Successfully loaded \(searches.count) recent searches.")
+        } catch {
+            logger.error("Failed to load recent searches: \(error.localizedDescription)")
+            self.recentSearches = [] // Clear on error
+        }
+    }
     
     // MARK: - Private Helpers
     private func fetchRestaurants(isNewSearch: Bool) async {
@@ -159,6 +193,14 @@ class SearchViewModel: ObservableObject {
             state = .success(allRestaurants)
             
             if isNewSearch {
+                if let token = AuthTokenProvider.token {
+                    Task(priority: .background) {
+                        try? await APIService.shared.saveRecentSearch(searchTerm: searchTerm, token: token)
+                        logger.info("Attempted to save recent search: '\(self.searchTerm)'")
+                        // --- MODIFIED: Immediately refresh the list after saving ---
+                        await self.fetchRecentSearches()
+                    }
+                }
                 Analytics.logEvent("search_performed", parameters: ["search_term": searchTerm, "result_count": newRestaurants.count])
             }
             

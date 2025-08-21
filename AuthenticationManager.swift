@@ -1,5 +1,12 @@
+// In file: AuthenticationManager.swift
+
 import Foundation
 import AuthenticationServices
+
+// A notification name to broadcast when recent searches are cleared.
+extension Notification.Name {
+    static let didClearRecentSearches = Notification.Name("didClearRecentSearches")
+}
 
 @MainActor
 class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
@@ -11,6 +18,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
     
     @Published var authState: AuthState = .signedOut
     @Published var favorites: [String: Restaurant] = [:]
+    @Published var recentSearches: [RecentSearch] = []
     
     private var identityToken: String?
     private var postSignInAction: (() -> Void)?
@@ -22,12 +30,15 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
             self.identityToken = token
             AuthTokenProvider.token = token
             Task {
+                // Now fetches both when the app starts
                 await fetchFavorites()
+                await fetchRecentSearches()
             }
             print("User is already signed in with ID: \(userID)")
         }
     }
-        func signIn(completion: (() -> Void)? = nil) {
+    
+    func signIn(completion: (() -> Void)? = nil) {
         self.postSignInAction = completion
         
         let request = ASAuthorizationAppleIDProvider().createRequest()
@@ -43,6 +54,8 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
             try KeychainHelper.deleteToken()
             self.authState = .signedOut
             self.favorites = [:]
+            // --- MODIFIED ---
+            self.recentSearches = [] // Clear searches on sign out
             self.identityToken = nil
             AuthTokenProvider.token = nil
             print("User successfully signed out.")
@@ -50,8 +63,6 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
             print("Error signing out: \(error)")
         }
     }
-    
-    // In file: AuthenticationManager.swift
 
     func deleteAccount() async {
         guard let token = self.identityToken else {
@@ -61,18 +72,15 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
         
         do {
             try await APIService.shared.deleteUser(token: token)
-            // If the API call is successful, perform a local sign out
-            // to clear all data from the device.
             signOut()
             print("User account deleted successfully.")
         } catch {
             print("Error deleting user account: \(error)")
-            // We could show an error to the user here in a real app
         }
     }
     
     
-    // MARK: - Favorites Management
+    // MARK: - User Data Management
     
     func fetchFavorites() async {
         guard let token = self.identityToken else { return }
@@ -90,14 +98,43 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
         }
     }
 
+    func fetchRecentSearches() async {
+        guard let token = self.identityToken else { return }
+        do {
+            let searches = try await APIService.shared.fetchRecentSearches(token: token)
+            self.recentSearches = searches
+        } catch {
+            print("Error fetching recent searches: \(error)")
+        }
+    }
+    
+    func clearRecentSearches() {
+           guard let token = self.identityToken else { return }
+           
+           let oldSearches = self.recentSearches
+           self.recentSearches = []
+           
+           Task {
+               do {
+                   try await APIService.shared.clearRecentSearches(token: token)
+                   // On success, post the notification
+                   NotificationCenter.default.post(name: .didClearRecentSearches, object: nil)
+               } catch {
+                   self.recentSearches = oldSearches
+                   print("Error clearing recent searches: \(error)")
+               }
+           }
+       }
+
+
     func addFavorite(_ restaurant: Restaurant) {
         guard let camis = restaurant.camis, let token = self.identityToken else { return }
-        self.favorites[camis] = restaurant // Optimistically update UI
+        self.favorites[camis] = restaurant
         Task {
             do {
                 try await APIService.shared.addFavorite(camis: camis, token: token)
             } catch {
-                self.favorites.removeValue(forKey: camis) // Revert on failure
+                self.favorites.removeValue(forKey: camis)
                 print("Error adding favorite: \(error)")
             }
         }
@@ -105,12 +142,12 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
     
     func removeFavorite(_ restaurant: Restaurant) {
         guard let camis = restaurant.camis, let token = self.identityToken else { return }
-        self.favorites.removeValue(forKey: camis) // Optimistically update UI
+        self.favorites.removeValue(forKey: camis)
         Task {
             do {
                 try await APIService.shared.removeFavorite(camis: camis, token: token)
             } catch {
-                self.favorites[camis] = restaurant // Revert on failure
+                self.favorites[camis] = restaurant
                 print("Error removing favorite: \(error)")
             }
         }
@@ -128,7 +165,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
               let identityTokenData = appleIDCredential.identityToken,
               let identityToken = String(data: identityTokenData, encoding: .utf8) else {
             print("Error: Missing or invalid identity token.")
-            postSignInAction = nil // Clear action on failure
+            postSignInAction = nil
             return
         }
         
@@ -146,13 +183,17 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
                 AuthTokenProvider.token = identityToken
                 
                 self.authState = .signedIn(userID: userID)
+                
+                // Now fetches both after a new sign-in
                 await self.fetchFavorites()
+                await self.fetchRecentSearches()
+                
                 self.postSignInAction?()
-                self.postSignInAction = nil // Clear the action so it doesn't run again.
+                self.postSignInAction = nil
                 
             } catch {
                 print("Error during sign in process: \(error)")
-                self.postSignInAction = nil // Clear on error too.
+                self.postSignInAction = nil
             }
         }
     }

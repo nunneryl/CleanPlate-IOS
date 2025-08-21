@@ -7,7 +7,6 @@ struct ProfileView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @Environment(\.colorScheme) var colorScheme
     
-    // <<< NEW: The state variable is moved here, to the top level of the View >>>
     @State private var isShowingDeleteAlert = false
     
     var body: some View {
@@ -21,6 +20,12 @@ struct ProfileView: View {
                 }
             }
             .navigationTitle("Profile")
+            // This tells the view to refresh its data every time it appears
+            .onAppear {
+                Task {
+                    await authManager.fetchRecentSearches()
+                }
+            }
         }
         .navigationViewStyle(.stack)
     }
@@ -46,13 +51,12 @@ struct ProfileView: View {
     }
     
     private func signedInView(userID: String) -> some View {
-        // NOTE: The @State variable is no longer declared here.
-        
         let favoritedRestaurants = authManager.favorites.values.sorted {
             ($0.dba ?? "") < ($1.dba ?? "")
         }
         
         return List {
+            // FAVORITES SECTION
             Section(header: Text("My Favorites (\(favoritedRestaurants.count))")) {
                 if favoritedRestaurants.isEmpty {
                     Text("You haven't saved any favorites yet. Tap the heart icon on a restaurant's page to add it here.")
@@ -86,6 +90,36 @@ struct ProfileView: View {
                 }
             }
             
+            // RECENT SEARCHES SECTION
+            Section {
+                // The list of recent searches
+                ForEach(authManager.recentSearches) { search in
+                    HStack {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .foregroundColor(.secondary)
+                        Text(search.search_term_display)
+                    }
+                }
+            } header: {
+                // Section header with the new "Clear" button
+                HStack {
+                    Text("Recent Searches")
+                    Spacer()
+                    if !authManager.recentSearches.isEmpty {
+                        Button("Clear") {
+                            authManager.clearRecentSearches()
+                        }
+                    }
+                }
+            } footer: {
+                // Show a footer if the list is empty
+                if authManager.recentSearches.isEmpty {
+                    Text("Your recent searches will appear here.")
+                        .padding(.vertical, 4)
+                }
+            }
+            
+            // ACCOUNT ACTIONS SECTION
             Section {
                 Button("Sign Out", role: .destructive) {
                     authManager.signOut()
@@ -108,4 +142,3 @@ struct ProfileView: View {
         }
     }
 }
-

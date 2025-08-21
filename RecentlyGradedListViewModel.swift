@@ -1,87 +1,72 @@
 // In file: RecentlyGradedListViewModel.swift
 
 import Foundation
+import Combine
 
 @MainActor
 class RecentlyGradedListViewModel: ObservableObject {
     
     enum ListState {
         case loading
-        case success([Restaurant])
+        case success
         case error(String)
     }
     
+    // MARK: - Published Properties
+    
     @Published var state: ListState = .loading
     
-    // Filter & Sort Properties
-    @Published var boroFilter: BoroOption = .any
-    @Published var gradeFilter: GradeOption = .any
-    @Published var sortOption: SortOption = .dateDesc
+    @Published var selectedBoro: BoroOption = .any
+    @Published var selectedGrade: GradeOption = .any
+    
+    // --- Data Properties ---
+    @Published var recentlyGradedRestaurants: [Restaurant] = []
+    @Published var recentlyClosedRestaurants: [Restaurant] = []
+    @Published var recentlyReopenedRestaurants: [Restaurant] = []
+    
+    // --- A computed property to hold the filtered list ---
+    var filteredRecentlyGraded: [Restaurant] {
+        var filteredList = recentlyGradedRestaurants
 
-    // In file: RecentlyGradedListViewModel.swift
-
-    var filteredRestaurants: [Restaurant] {
-        guard case .success(let restaurants) = state else {
-            return []
+        // Apply Borough Filter
+        if selectedBoro != .any {
+            // We use case-insensitive comparison for robustness
+            filteredList = filteredList.filter { $0.boro?.caseInsensitiveCompare(selectedBoro.rawValue) == .orderedSame }
         }
-        
-        var processedList = restaurants
-        
-        // Filtering Logic
-        if boroFilter != .any {
-            processedList = processedList.filter { $0.boro?.caseInsensitiveCompare(boroFilter.rawValue) == .orderedSame }
-        }
-        
-        if gradeFilter != .any {
-            processedList = processedList.filter { restaurant in
-                // Get the true most recent inspection for the restaurant
-                guard let latestInspection = restaurant.inspections?.sorted(by: { $0.inspection_date ?? "" > $1.inspection_date ?? "" }).first else {
-                    return false
-                }
-                
-                let latestGrade = latestInspection.grade ?? ""
 
-                switch gradeFilter {
-                case .closed:
-                    // Check if the latest action was a closure
-                    return latestInspection.action?.lowercased().contains("closed by dohmh") == true
-                case .pending:
-                    // Check for pending grades
-                    return latestGrade == "P" || latestGrade == "Z"
-                case .any:
-                    return true
-                case .a, .b, .c:
-                    return latestGrade == gradeFilter.rawValue
-                }
+        // Apply Grade Filter
+        if selectedGrade != .any {
+            if selectedGrade == .pending {
+                // "Grade Pending" can have multiple values in the data ('P' or 'Z')
+                filteredList = filteredList.filter { ["P", "Z"].contains($0.mostRecentInspectionGrade ?? "") }
+            } else {
+                filteredList = filteredList.filter { $0.mostRecentInspectionGrade == selectedGrade.rawValue }
             }
         }
         
-        // Sorting Logic (remains unchanged)
-        switch sortOption {
-        case .nameAsc:
-            processedList.sort { ($0.dba ?? "") < ($1.dba ?? "") }
-        case .nameDesc:
-            processedList.sort { ($0.dba ?? "") > ($1.dba ?? "") }
-        case .gradeAsc:
-            processedList.sort { ($0.latestFinalGrade ?? "Z") < ($1.latestFinalGrade ?? "Z") }
-        case .dateDesc, .relevance:
-            break
-        }
-        
-        return processedList
+        return filteredList
     }
-    
+
     init() {}
     
     func loadContent() async {
-        if case .success = self.state {
-            return
-        }
+        guard recentlyGradedRestaurants.isEmpty else { return }
         
         self.state = .loading
+        
         do {
-            let newRestaurants = try await APIService.shared.fetchRecentlyGraded(limit: 100)
-            self.state = .success(newRestaurants)
+            async let graded = APIService.shared.fetchRecentlyGraded()
+            async let actions = APIService.shared.fetchRecentActions()
+            
+            let gradedResults = try await graded
+            let actionResults = try await actions
+            
+            self.recentlyGradedRestaurants = gradedResults
+            self.recentlyClosedRestaurants = actionResults.recently_closed
+            self.recentlyReopenedRestaurants = actionResults.recently_reopened
+            
+            self.state = .success
+            
         } catch {
             let errorMessage = (error as? APIError)?.description ?? "An unknown error occurred."
             self.state = .error(errorMessage)

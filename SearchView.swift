@@ -28,7 +28,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Discovery Card View (UPDATED)
+// MARK: - Discovery Card View
 struct DiscoveryCardView: View {
     let restaurant: Restaurant
 
@@ -55,7 +55,6 @@ struct DiscoveryCardView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 
-                // This now calls the new helper function with the correct grade property
                 gradeIcon(for: restaurant.mostRecentInspectionGrade)
             }
         }
@@ -94,6 +93,7 @@ struct DiscoveryCardView: View {
 
 struct SearchView: View {
     @EnvironmentObject var viewModel: SearchViewModel
+    @EnvironmentObject var authManager: AuthenticationManager
     @FocusState private var isSearchFieldFocused: Bool
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
@@ -109,14 +109,12 @@ struct SearchView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                // Header and Search Bar are always visible
                 VStack(spacing: 20) {
                     headerSection
                     searchBar
                 }
                 .padding(.top, 20)
                 
-                // The body now uses a switch on viewModel.state for cleaner logic
                 switch viewModel.state {
                 case .idle:
                     idleView
@@ -124,7 +122,6 @@ struct SearchView: View {
                 case .loading:
                     SkeletonLoadingView().transition(.opacity)
                 
-                // <<< THIS IS THE FIX: Combine .success and .loadingMore cases >>>
                 case .success(let restaurants), .loadingMore(let restaurants):
                     if restaurants.isEmpty {
                         emptySearchResultsView
@@ -153,7 +150,7 @@ struct SearchView: View {
             Analytics.logEvent(AnalyticsEventScreenView,
                                parameters: [AnalyticsParameterScreenName: "Search", AnalyticsParameterScreenClass: "\(SearchView.self)"])
             Task {
-                await viewModel.loadDiscoveryLists()
+                await viewModel.loadIdleScreenContent()
             }
         }
     }
@@ -162,12 +159,18 @@ struct SearchView: View {
 
     private var idleView: some View {
         VStack {
-            if !viewModel.recentlyGradedRestaurants.isEmpty {
-                discoveryListView
+            // If the search bar is focused and we have recent searches, show them.
+            if isSearchFieldFocused && !viewModel.recentSearches.isEmpty && viewModel.searchTerm.isEmpty {
+                recentSearchesView
+            } else {
+                // Otherwise, show the default idle content.
+                if !viewModel.recentlyGradedRestaurants.isEmpty {
+                    discoveryListView
+                }
+                Spacer()
+                disclaimerText
+                Spacer()
             }
-            Spacer()
-            disclaimerText
-            Spacer()
         }
     }
 
@@ -242,7 +245,8 @@ struct SearchView: View {
                 withAnimation(.easeInOut(duration: 0.2)) { isRecentlyGradedExpanded.toggle() }
             }) {
                 HStack {
-                    Text("Recently Graded").font(.system(size: 20, weight: .bold, design: .rounded))
+                    Text("Grade & Status Changes")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
                     Spacer()
                     Image(systemName: "chevron.right").font(.system(size: 16, weight: .semibold)).rotationEffect(.degrees(isRecentlyGradedExpanded ? 90 : 0))
                 }
@@ -303,6 +307,39 @@ struct SearchView: View {
             await viewModel.performSearch()
         }
     }
+
+    private var recentSearchesView: some View {
+           List {
+               Section {
+                   ForEach(viewModel.recentSearches) { search in
+                       Button(action: {
+                           viewModel.searchTerm = search.search_term_display
+                           submitSearch()
+                       }) {
+                           HStack {
+                               Image(systemName: "clock.arrow.circlepath")
+                               Text(search.search_term_display)
+                               Spacer()
+                           }
+                           .foregroundColor(.primary)
+                       }
+                   }
+               } header: {
+                   HStack {
+                       Text("Recent Searches")
+                       Spacer()
+                       if !viewModel.recentSearches.isEmpty {
+                           Button("Clear") {
+                               // This now calls the function in the authManager
+                               authManager.clearRecentSearches()
+                           }
+                       }
+                   }
+               }
+           }
+           .listStyle(.plain)
+           .transition(.asymmetric(insertion: .opacity.animation(.easeIn(duration: 0.2)), removal: .opacity.animation(.easeOut(duration: 0.1))))
+       }
     
     private var disclaimerText: some View {
         VStack {
