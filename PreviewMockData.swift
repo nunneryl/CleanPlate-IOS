@@ -20,11 +20,11 @@ struct PreviewMockData {
             latitude: 40.8560,
             longitude: -73.8837,
             cuisine_description: "Pizza",
-            grade_date: "2025-07-08",
-            foursquare_fsq_id: nil, // <-- ADDED
-            google_place_id: nil,   // <-- ADDED
+            grade_date: "2025-08-26",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
             inspections: [
-                Inspection(inspection_date: "2025-07-08T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
+                Inspection(inspection_date: "2025-08-26T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ]
         ),
         // 2. Neighborhood Cafe - Graded Yesterday
@@ -39,18 +39,18 @@ struct PreviewMockData {
             latitude: 40.7400,
             longitude: -74.0000,
             cuisine_description: "Cafe/Variety",
-            grade_date: "2025-07-07",
-            foursquare_fsq_id: nil, // <-- ADDED
-            google_place_id: nil,   // <-- ADDED
+            grade_date: "2025-08-25",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
             inspections: [
-                Inspection(inspection_date: "2025-07-07T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: []),
+                Inspection(inspection_date: "2025-08-25T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: []),
                 Inspection(inspection_date: "2024-04-15T00:00:00", critical_flag: "Critical", grade: "B", inspection_type: "Cycle Inspection / Re-inspection", action: nil, violations: [
                     Violation(violation_code: "04L", violation_description: "Evidence of mice or live mice present in facility's food and/or non-food areas."),
                     Violation(violation_code: "02B", violation_description: "Hot food item not held at or above 140º F.")
                 ])
             ]
         ),
-        // 3. Side Street Tacos - NEW - Graded 2 days ago
+        // 3. Side Street Tacos - Graded 2 days ago
         Restaurant(
             camis: "66666666",
             dba: "Side Street Tacos",
@@ -62,11 +62,11 @@ struct PreviewMockData {
             latitude: 40.7650,
             longitude: -73.9230,
             cuisine_description: "Tacos",
-            grade_date: "2025-07-06",
-            foursquare_fsq_id: nil, // <-- ADDED
-            google_place_id: nil,   // <-- ADDED
+            grade_date: "2025-08-24",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
             inspections: [
-                Inspection(inspection_date: "2025-07-06T00:00:00", critical_flag: "Not Critical", grade: "B", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
+                Inspection(inspection_date: "2025-08-24T00:00:00", critical_flag: "Not Critical", grade: "B", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ]
         ),
         // 4. Downtown Diner - Graded 3 days ago
@@ -81,18 +81,18 @@ struct PreviewMockData {
             latitude: 40.7027,
             longitude: -73.9906,
             cuisine_description: "American Diner",
-            grade_date: "2025-07-05",
-            foursquare_fsq_id: nil, // <-- ADDED
-            google_place_id: nil,   // <-- ADDED
+            grade_date: "2025-08-23",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
             inspections: [
-                Inspection(inspection_date: "2025-07-05T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [
+                Inspection(inspection_date: "2025-08-23T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [
                     Violation(violation_code: "08A", violation_description: "Facility not vermin proof."),
                     Violation(violation_code: "06C", violation_description: "Food not protected from potential source of contamination."),
                     Violation(violation_code: "02G", violation_description: "Cold food item held above 41° F.")
                 ])
             ]
         ),
-        // 5. Uptown Grill - NEW - Graded 5 days ago
+        // 5. Uptown Grill - Graded 5 days ago
         Restaurant(
             camis: "77777777",
             dba: "Uptown Grill",
@@ -104,11 +104,11 @@ struct PreviewMockData {
             latitude: 40.7750,
             longitude: -73.9550,
             cuisine_description: "Steakhouse",
-            grade_date: "2025-07-03",
-            foursquare_fsq_id: nil, // <-- ADDED
-            google_place_id: nil,   // <-- ADDED
+            grade_date: "2025-08-21",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
             inspections: [
-                Inspection(inspection_date: "2025-07-03T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
+                Inspection(inspection_date: "2025-08-21T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ]
         ),
         Restaurant(
@@ -123,8 +123,8 @@ struct PreviewMockData {
             longitude: -73.9485,
             cuisine_description: "Fusion",
             grade_date: nil,
-            foursquare_fsq_id: nil, // <-- ADDED
-            google_place_id: nil,   // <-- ADDED
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
             inspections: []
         ),
         Restaurant(
@@ -139,10 +139,69 @@ struct PreviewMockData {
             longitude: -73.9815,
             cuisine_description: "New American",
             grade_date: nil,
-            foursquare_fsq_id: nil, // <-- ADDED
-            google_place_id: nil,   // <-- ADDED
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
             inspections: [
-                Inspection(inspection_date: "2025-06-25T00:00:00", critical_flag: "Not Applicable", grade: "N", inspection_type: "Pre-permit (Operational) / Initial Inspection", action: nil, violations: [])
+                Inspection(inspection_date: "2025-08-15T00:00:00", critical_flag: "Not Applicable", grade: "N", inspection_type: "Pre-permit (Operational) / Initial Inspection", action: nil, violations: [])
+            ]
+        ),
+
+        Restaurant(
+            camis: "88888888",
+            dba: "The Greasy Spoon",
+            boro: "Brooklyn",
+            building: "777",
+            street: "Clogged Artery Ave",
+            zipcode: "11221",
+            phone: "2125558888",
+            latitude: 40.6900,
+            longitude: -73.9400,
+            cuisine_description: "Diner",
+            grade_date: "2025-08-20",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
+            inspections: [
+                Inspection(inspection_date: "2025-08-25T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Initial Inspection", action: "Establishment Closed by DOHMH. Violations of public health law constitute an imminent health hazard.", violations: [
+                     Violation(violation_code: "04L", violation_description: "Evidence of mice or live mice present in facility's food and/or non-food areas.")
+                ])
+            ]
+        ),
+        Restaurant(
+            camis: "99999999",
+            dba: "Sanitation Optional Sushi",
+            boro: "Manhattan",
+            building: "404",
+            street: "Health Inspector's Folly",
+            zipcode: "10003",
+            phone: "2125559999",
+            latitude: 40.7300,
+            longitude: -73.9900,
+            cuisine_description: "Sushi",
+            grade_date: "2025-08-19",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
+            inspections: [
+                Inspection(inspection_date: "2025-08-24T00:00:00", critical_flag: "Critical", grade: nil, inspection_type: "Cycle Inspection / Initial Inspection", action: "Establishment Closed by DOHMH.", violations: [
+                    Violation(violation_code: "02G", violation_description: "Cold food item held above 41° F.")
+                ])
+            ]
+        ),
+        Restaurant(
+            camis: "10101010",
+            dba: "Forgotten Deli",
+            boro: "Staten Island",
+            building: "500",
+            street: "Secluded Street",
+            zipcode: "10301",
+            phone: "2125551010",
+            latitude: 40.6400,
+            longitude: -74.0700,
+            cuisine_description: "Deli",
+            grade_date: "2025-08-18",
+            foursquare_fsq_id: nil,
+            google_place_id: nil,
+            inspections: [
+                Inspection(inspection_date: "2025-08-23T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Re-inspection", action: "Establishment Closed by DOHMH due to imminent health hazard.", violations: [])
             ]
         )
     ]

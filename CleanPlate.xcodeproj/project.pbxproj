@@ -17,6 +17,7 @@
 		32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */; };
 		32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */; };
 		32A4CAEB2E01A7A700CC8C37 /* FilterSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */; };
+		32B1E1C22E5E26DD0085C35D /* ScreenshotDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32B1E1C12E5E26DD0085C35D /* ScreenshotDependencies.swift */; };
 		32C138BB2D8F66CF006F4121 /* NYCFoodRatingsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */; };
 		32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138B82D8F66CF006F4121 /* MainTabView.swift */; };
 		32C138C92D8F67E2006F4121 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C72D8F67E2006F4121 /* SearchViewModel.swift */; };
@@ -75,6 +76,7 @@
 		32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManager.swift; sourceTree = "<group>"; };
 		32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterOptions.swift; sourceTree = "<group>"; };
 		32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSortView.swift; sourceTree = "<group>"; };
+		32B1E1C12E5E26DD0085C35D /* ScreenshotDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDependencies.swift; sourceTree = "<group>"; };
 		32C138B82D8F66CF006F4121 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NYCFoodRatingsApp.swift; sourceTree = "<group>"; };
 		32C138BE2D8F671B006F4121 /* CleanPlate-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CleanPlate-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				32C138C02D8F67E2006F4121 /* APIService.swift */,
 				32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */,
 				32A22CAE2E4BF80D0077653F /* KeychainHelper.swift */,
+				32B1E1C12E5E26DD0085C35D /* ScreenshotDependencies.swift */,
 				32C138C22D8F67E2006F4121 /* FAQView.swift */,
 				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
 				32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */,
@@ -374,6 +377,7 @@
 				3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */,
 				32C138CA2D8F67E2006F4121 /* AboutView.swift in Sources */,
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
+				32B1E1C22E5E26DD0085C35D /* ScreenshotDependencies.swift in Sources */,
 				32A22CAB2E4BD8DD0077653F /* AuthenticationManager.swift in Sources */,
 				32A22CA92E4BD6670077653F /* ProfileView.swift in Sources */,
 				323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */,
@@ -429,6 +433,144 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		32B1E1C32E5E29F70085C35D /* Debug-Screenshots */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited) SCREENSHOTS";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = "Debug-Screenshots";
+		};
+		32B1E1C42E5E29F70085C35D /* Debug-Screenshots */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 17;
+				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
+				DEVELOPMENT_TEAM = JZXVT367QR;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CleanPlate/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.9.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "CleanPlate-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-Screenshots";
+		};
+		32B1E1C52E5E29F70085C35D /* Debug-Screenshots */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZXVT367QR;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nunzo.NYCFoodRatingsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CleanPlate.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CleanPlate";
+			};
+			name = "Debug-Screenshots";
+		};
+		32B1E1C62E5E29F70085C35D /* Debug-Screenshots */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZXVT367QR;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nunzo.NYCFoodRatingsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = NYCFoodRatings;
+			};
+			name = "Debug-Screenshots";
+		};
 		32D9DA862CBDFB7900BA92E1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -704,6 +846,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32D9DA862CBDFB7900BA92E1 /* Debug */,
+				32B1E1C32E5E29F70085C35D /* Debug-Screenshots */,
 				32D9DA872CBDFB7900BA92E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -713,6 +856,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32D9DA892CBDFB7900BA92E1 /* Debug */,
+				32B1E1C42E5E29F70085C35D /* Debug-Screenshots */,
 				32D9DA8A2CBDFB7900BA92E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -722,6 +866,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32D9DA8C2CBDFB7900BA92E1 /* Debug */,
+				32B1E1C52E5E29F70085C35D /* Debug-Screenshots */,
 				32D9DA8D2CBDFB7900BA92E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -731,6 +876,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32D9DA8F2CBDFB7900BA92E1 /* Debug */,
+				32B1E1C62E5E29F70085C35D /* Debug-Screenshots */,
 				32D9DA902CBDFB7900BA92E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

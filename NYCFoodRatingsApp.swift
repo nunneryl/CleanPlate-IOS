@@ -6,21 +6,28 @@ import FirebaseCore
 
 @main
 struct NYCFoodRatingsApp: App {
-    @StateObject private var authManager = AuthenticationManager()
     
+    #if SCREENSHOTS
+    @StateObject private var authManager = MockAuthenticationManager()
+    #else
+    @StateObject private var authManager = AuthenticationManager()
+    #endif
+
     init() {
+        #if SCREENSHOTS
+        APIService.shared = MockAPIService()
+        print("🚀 App starting in SCREENSHOT mode with mock data.")
+        #else
         FirebaseApp.configure()
-        print("Firebase configured successfully!")
-        let launchStart = Date()
-        let elapsed = Date().timeIntervalSince(launchStart)
-        os_log("App launch time: %.2f seconds", elapsed)
+        print("🔥 App starting in LIVE mode.")
+        #endif
     }
 
     var body: some Scene {
         WindowGroup {
             MainTabView()
-                // <<< NEW: Make the authManager available to all child views >>>
-                .environmentObject(authManager)
+                // --- MODIFIED: Explicitly cast the object to the expected type ---
+                .environmentObject(authManager as AuthenticationManager)
         }
     }
 }

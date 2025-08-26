@@ -37,9 +37,9 @@ struct AuthTokenProvider {
 
 class APIService {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "APIService")
-    static let shared = APIService()
+    static var shared = APIService()
     
-    private init() {}
+    public init() {}
     private let baseURL = "https://cleanplate-production.up.railway.app"
     
     // MARK: - Public API Methods
