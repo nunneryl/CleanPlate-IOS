@@ -40,7 +40,15 @@ class APIService {
     static var shared = APIService()
     
     public init() {}
-    private let baseURL = "https://cleanplate-production.up.railway.app"
+    private var baseURL: String {
+        #if PREVIEW
+        // For a new preview branch, just paste the new URL here.
+        return "https://cleanplate-cleanplate-pr-20.up.railway.app"
+        #else
+        // Defaults to the production URL for all other builds.
+        return "https://cleanplate-production.up.railway.app"
+        #endif
+    }
     
     // MARK: - Public API Methods
     
@@ -59,8 +67,8 @@ class APIService {
         return try await buildAndPerformRequest(path: "/search", queryItems: queryItems)
     }
     
-    func fetchRecentlyGraded() async throws -> [Restaurant] {
-        return try await buildAndPerformRequest(path: "/lists/recently-graded")
+    func fetchRecentActivity() async throws -> [Restaurant] {
+        return try await buildAndPerformRequest(path: "/lists/recent-activity")
     }
     
     func fetchRecentActions() async throws -> RecentActionsResponse {

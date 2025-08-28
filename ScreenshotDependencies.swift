@@ -23,26 +23,23 @@ class MockAPIService: APIService {
         return Array(PreviewMockData.mockRestaurants.prefix(5))
     }
     
-    override func fetchRecentlyGraded() async throws -> [Restaurant] {
+    // --- REPLACED fetchRecentlyGraded with fetchRecentActivity to match the new API design ---
+    override func fetchRecentActivity() async throws -> [Restaurant] {
         try await Task.sleep(nanoseconds: mockNetworkDelay)
+        // For screenshots, just return the whole mock list as if it's all recent.
         return PreviewMockData.mockRestaurants
     }
     
-    // --- MODIFIED: This function now correctly finds and returns closed restaurants ---
     override func fetchRecentActions() async throws -> RecentActionsResponse {
         try await Task.sleep(nanoseconds: mockNetworkDelay)
         
-        // Filter the main mock data list to find restaurants closed by the DOHMH.
         let closedRestaurants = PreviewMockData.mockRestaurants.filter { restaurant in
-            // Get the most recent inspection for the restaurant.
             guard let latestInspection = restaurant.inspections?.sorted(by: { $0.inspection_date ?? "" > $1.inspection_date ?? "" }).first else {
                 return false
             }
-            // Check if the 'action' field indicates it was closed.
             return latestInspection.action?.lowercased().contains("closed by dohmh") ?? false
         }
         
-        // For now, we will keep re-opened empty unless we add data for it.
         return RecentActionsResponse(recently_closed: closedRestaurants, recently_reopened: [])
     }
     

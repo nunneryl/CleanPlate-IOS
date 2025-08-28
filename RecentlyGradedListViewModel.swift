@@ -19,26 +19,25 @@ class RecentlyGradedListViewModel: ObservableObject {
     @Published var selectedBoro: BoroOption = .any
     @Published var selectedGrade: GradeOption = .any
     
-    // --- Data Properties ---
-    @Published var recentlyGradedRestaurants: [Restaurant] = []
+    // --- MODIFIED: Simplified to a single list for all recent activity ---
+    @Published var recentActivity: [Restaurant] = []
+    
     @Published var recentlyClosedRestaurants: [Restaurant] = []
     @Published var recentlyReopenedRestaurants: [Restaurant] = []
     
-    // --- A computed property to hold the filtered list ---
-    var filteredRecentlyGraded: [Restaurant] {
-        var filteredList = recentlyGradedRestaurants
+    // --- MODIFIED: This now filters the new single list ---
+    var filteredRecentActivity: [Restaurant] {
+        var filteredList = recentActivity
 
         // Apply Borough Filter
         if selectedBoro != .any {
-            // We use case-insensitive comparison for robustness
             filteredList = filteredList.filter { $0.boro?.caseInsensitiveCompare(selectedBoro.rawValue) == .orderedSame }
         }
 
         // Apply Grade Filter
         if selectedGrade != .any {
             if selectedGrade == .pending {
-                // "Grade Pending" can have multiple values in the data ('P' or 'Z')
-                filteredList = filteredList.filter { ["P", "Z"].contains($0.mostRecentInspectionGrade ?? "") }
+                filteredList = filteredList.filter { ["P", "Z", "N"].contains($0.mostRecentInspectionGrade ?? "") }
             } else {
                 filteredList = filteredList.filter { $0.mostRecentInspectionGrade == selectedGrade.rawValue }
             }
@@ -50,18 +49,19 @@ class RecentlyGradedListViewModel: ObservableObject {
     init() {}
     
     func loadContent() async {
-        guard recentlyGradedRestaurants.isEmpty else { return }
+        // Prevent re-loading if data is already present
+        guard recentActivity.isEmpty else { return }
         
         self.state = .loading
         
         do {
-            async let graded = APIService.shared.fetchRecentlyGraded()
+            // --- MODIFIED: Fetch recent activity and actions in parallel ---
+            async let activity = APIService.shared.fetchRecentActivity()
             async let actions = APIService.shared.fetchRecentActions()
             
-            let gradedResults = try await graded
-            let actionResults = try await actions
+            let (activityResults, actionResults) = try await (activity, actions)
             
-            self.recentlyGradedRestaurants = gradedResults
+            self.recentActivity = activityResults
             self.recentlyClosedRestaurants = actionResults.recently_closed
             self.recentlyReopenedRestaurants = actionResults.recently_reopened
             

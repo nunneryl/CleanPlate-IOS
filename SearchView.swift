@@ -133,7 +133,21 @@ struct SearchView: View {
                     errorView(message: message)
                 }
             }
-            .background(Color(UIColor.systemBackground).ignoresSafeArea())
+            .background(
+                ZStack {
+                    Color(UIColor.systemBackground).ignoresSafeArea()
+                    
+                    VStack {
+                        Spacer()
+                        Image("nyc_footer")
+                            .resizable()
+                            .scaledToFit()
+                            .saturation(0)
+                            .opacity(0.1)
+                            .allowsHitTesting(false)
+                    }
+                }
+            )
             .navigationTitle("").navigationBarHidden(true)
             .sheet(isPresented: $isShowingFilterSheet) {
                 FilterSortView(
@@ -157,6 +171,7 @@ struct SearchView: View {
 
     // MARK: - Subviews
 
+    // --- MODIFIED: Removed conditional logic to ensure discoveryListView is always shown ---
     private var idleView: some View {
         VStack {
             // If the search bar is focused and we have recent searches, show them.
@@ -164,9 +179,7 @@ struct SearchView: View {
                 recentSearchesView
             } else {
                 // Otherwise, show the default idle content.
-                if !viewModel.recentlyGradedRestaurants.isEmpty {
-                    discoveryListView
-                }
+                discoveryListView
                 Spacer()
                 disclaimerText
                 Spacer()
@@ -238,6 +251,7 @@ struct SearchView: View {
         .padding(.horizontal)
     }
     
+    // --- MODIFIED: Now handles the loading state internally ---
     private var discoveryListView: some View {
         VStack(spacing: 0) {
             Button(action: {
@@ -253,28 +267,35 @@ struct SearchView: View {
                 .foregroundColor(.primary).padding(.horizontal).padding(.vertical, 8)
             }
             if isRecentlyGradedExpanded {
-                VStack(spacing: 12) {
-                    HStack {
-                        Spacer()
-                        NavigationLink(destination: RecentlyGradedListView()) {
-                            HStack(spacing: 4) {
-                                Text("See All")
-                                Image(systemName: "chevron.right")
-                            }
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        }
-                    }.padding(.horizontal)
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(viewModel.recentlyGradedRestaurants) { restaurant in
-                                NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)) {
-                                    DiscoveryCardView(restaurant: restaurant)
-                                }.buttonStyle(PlainButtonStyle())
+                // If data is empty, show a loading indicator. Otherwise, show the cards.
+                if viewModel.recentlyGradedRestaurants.isEmpty {
+                    ProgressView()
+                        .frame(height: 140)
+                        .transition(.opacity)
+                } else {
+                    VStack(spacing: 12) {
+                        HStack {
+                            Spacer()
+                            NavigationLink(destination: RecentlyGradedListView()) {
+                                HStack(spacing: 4) {
+                                    Text("See All")
+                                    Image(systemName: "chevron.right")
+                                }
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
                             }
                         }.padding(.horizontal)
-                    }.frame(height: 140)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 16) {
+                                ForEach(viewModel.recentlyGradedRestaurants) { restaurant in
+                                    NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)) {
+                                        DiscoveryCardView(restaurant: restaurant)
+                                    }.buttonStyle(PlainButtonStyle())
+                                }
+                            }.padding(.horizontal)
+                        }.frame(height: 140)
+                    }
+                    .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: -10)), removal: .opacity)).padding(.bottom, 8)
                 }
-                .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: -10)), removal: .opacity)).padding(.bottom, 8)
             }
         }
     }
@@ -348,6 +369,7 @@ struct SearchView: View {
                 .font(.system(size: horizontalSizeClass == .compact ? 14 : 16))
                 .italic().foregroundColor(.secondary).multilineTextAlignment(.center).padding(.horizontal, horizontalSizeClass == .compact ? 30 : 40)
             Spacer()
+            
         }
     }
 

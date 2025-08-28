@@ -18,17 +18,34 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let foursquare_fsq_id: String?
     let google_place_id: String?
     let inspections: [Inspection]?
+    let update_type: String?
+    let activity_date: String?
 
     var id: String { camis ?? UUID().uuidString }
 
+    // In file: Models.swift
+
     var relativeGradeDate: String {
-        guard let dateStr = self.grade_date, let date = DateHelper.parseDate(dateStr) else { return "" }
+        // Use the new activity_date for finalized grades for correct timing, but always use the "Graded" prefix.
+        let dateStringToUse = (update_type == "finalized") ? self.activity_date : self.grade_date
+        let prefix = "Graded"
+        
+        guard let dateStr = dateStringToUse, let date = DateHelper.parseDate(dateStr) else {
+            return "Not Yet Graded"
+        }
+        
         let calendar = Calendar.current
-        if calendar.isDateInToday(date) { return "Graded today" }
-        if calendar.isDateInYesterday(date) { return "Graded yesterday" }
+        if calendar.isDateInToday(date) { return "\(prefix) today" }
+        if calendar.isDateInYesterday(date) { return "\(prefix) yesterday" }
+        
         let components = calendar.dateComponents([.day], from: date, to: Date())
-        if let day = components.day { return "Graded \(day + 1) days ago" }
-        return ""
+        if let day = components.day, day < 30 {
+            return "\(prefix) \(day + 1) days ago"
+        }
+        
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return "\(prefix) on \(formatter.string(from: date))"
     }
     
     func fullAddress() -> String {
@@ -125,7 +142,6 @@ struct RecentSearch: Codable, Identifiable, Equatable {
     let search_term_display: String
     let created_at: String
 }
-// --- END NEW ---
 
 struct DateHelper {
     static func formatDate(_ dateStr: String?) -> String {

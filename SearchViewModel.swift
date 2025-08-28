@@ -109,19 +109,20 @@ class SearchViewModel: ObservableObject {
         guard !isLoadingDiscovery else { return }
         self.isLoadingDiscovery = true
         
-        // Run both network calls in parallel for better performance
-        async let gradedTask = APIService.shared.fetchRecentlyGraded()
+        // --- MODIFIED: Changed to call the new unified endpoint ---
+        async let activityTask = APIService.shared.fetchRecentActivity()
         async let recentSearchesTask: () = self.fetchRecentSearches()
         
         do {
-            let restaurants = try await gradedTask
-            self.recentlyGradedRestaurants = restaurants
-            logger.info("Successfully loaded \(restaurants.count) recently graded restaurants.")
+            let restaurants = try await activityTask
+            // Use the same property, but only take the first 10 for the home screen preview
+            self.recentlyGradedRestaurants = Array(restaurants.prefix(10))
+            logger.info("Successfully loaded \(self.recentlyGradedRestaurants.count) recent activity items for idle screen.")
         } catch {
-            logger.error("Failed to load recently graded list: \(error.localizedDescription)")
+            logger.error("Failed to load recent activity list: \(error.localizedDescription)")
         }
         
-        await recentSearchesTask // Await the result of the searches fetch
+        await recentSearchesTask
         
         self.isLoadingDiscovery = false
     }
@@ -146,10 +147,9 @@ class SearchViewModel: ObservableObject {
             logger.info("Analytics event logged: view_recently_graded_all")
         }
     
-    // --- NEW: Dedicated function to fetch recent searches ---
     func fetchRecentSearches() async {
         guard let token = AuthTokenProvider.token else {
-            self.recentSearches = [] // Clear searches if user is logged out
+            self.recentSearches = []
             return
         }
         
@@ -159,7 +159,7 @@ class SearchViewModel: ObservableObject {
             logger.info("Successfully loaded \(searches.count) recent searches.")
         } catch {
             logger.error("Failed to load recent searches: \(error.localizedDescription)")
-            self.recentSearches = [] // Clear on error
+            self.recentSearches = []
         }
     }
     
@@ -197,7 +197,6 @@ class SearchViewModel: ObservableObject {
                     Task(priority: .background) {
                         try? await APIService.shared.saveRecentSearch(searchTerm: searchTerm, token: token)
                         logger.info("Attempted to save recent search: '\(self.searchTerm)'")
-                        // --- MODIFIED: Immediately refresh the list after saving ---
                         await self.fetchRecentSearches()
                     }
                 }

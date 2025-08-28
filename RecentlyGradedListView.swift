@@ -5,6 +5,7 @@ import SwiftUI
 struct RecentlyGradedListView: View {
     @StateObject private var viewModel = RecentlyGradedListViewModel()
     
+    // --- MODIFIED: Back to three tabs ---
     private enum SelectedTab: String, CaseIterable {
         case graded = "Graded"
         case closed = "Closed"
@@ -13,9 +14,7 @@ struct RecentlyGradedListView: View {
     @State private var selectedTab: SelectedTab = .graded
     
     var body: some View {
-        // The main VStack now correctly holds only the Picker and the Form
         VStack(spacing: 0) {
-            // The Picker sits outside the Form to act as a top-level control
             Picker("Select a list", selection: $selectedTab) {
                 ForEach(SelectedTab.allCases, id: \.self) { tab in
                     Text(tab.rawValue).tag(tab)
@@ -24,13 +23,12 @@ struct RecentlyGradedListView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
             .padding(.bottom, 8)
-
-            // The main content area switches based on the view model's state
+            
             switch viewModel.state {
             case .loading:
                 ProgressView("Loading...")
                     .frame(maxHeight: .infinity)
-            
+                
             case .error(let errorMessage):
                 Text(errorMessage)
                     .foregroundColor(.secondary)
@@ -42,7 +40,7 @@ struct RecentlyGradedListView: View {
                 successView
             }
         }
-        .background(Color(.systemGroupedBackground)) // Use a grouped background color
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("Grade & Status Changes")
         .task {
             await viewModel.loadContent()
@@ -50,11 +48,7 @@ struct RecentlyGradedListView: View {
     }
     
     private var successView: some View {
-        // --- THE FIX ---
-        // The root of the content is now a Form, which is what the compiler expects
-        // for this combination of Pickers and Sections.
         Form {
-            // The filters appear conditionally as the first section
             if selectedTab == .graded {
                 Section(header: Text("Filter Graded List")) {
                     Picker("Borough", selection: $viewModel.selectedBoro) {
@@ -70,10 +64,10 @@ struct RecentlyGradedListView: View {
                 }
             }
             
-            // The content sections are displayed based on the selected tab
+            // --- MODIFIED: Simplified switch statement ---
             switch selectedTab {
             case .graded:
-                contentSection(for: viewModel.filteredRecentlyGraded,
+                contentSection(for: viewModel.filteredRecentActivity, // Use the new filtered list
                                emptyMessage: "No recently graded restaurants match your filters.")
             case .closed:
                 contentSection(for: viewModel.recentlyClosedRestaurants,
@@ -89,10 +83,8 @@ struct RecentlyGradedListView: View {
         }
     }
     
-    // Helper view for the content of each list
     @ViewBuilder
     private func contentSection(for restaurants: [Restaurant], emptyMessage: String, header: String? = nil, icon: String? = nil, color: Color? = nil) -> some View {
-        // We now use a custom header if provided, otherwise the section is anonymous
         Section(header: header != nil ? Text(header!) : nil) {
             if restaurants.isEmpty {
                 Text(emptyMessage)
@@ -107,7 +99,6 @@ struct RecentlyGradedListView: View {
         }
     }
     
-    // This reusable view for rows remains the same
     private func restaurantRowView(restaurant: Restaurant, icon: String? = nil, color: Color? = nil) -> some View {
         HStack {
             if let iconName = icon, let iconColor = color {
@@ -118,9 +109,18 @@ struct RecentlyGradedListView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(restaurant.dba ?? "Unknown")
                     .fontWeight(.semibold)
+                
                 Text("\(restaurant.formattedStreet), \(restaurant.formattedBoro)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+                
+                // Reverted to the gray, italicized, more descriptive subtitle
+                if restaurant.update_type == "finalized" {
+                    Text("Updated from Grade Pending")
+                        .font(.caption)
+                        .italic()
+                        .foregroundColor(.secondary) // Changed back to gray
+                }
             }
             Spacer()
             Image(restaurant.displayGradeImageName)

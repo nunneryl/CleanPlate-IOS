@@ -25,7 +25,10 @@ struct PreviewMockData {
             google_place_id: nil,
             inspections: [
                 Inspection(inspection_date: "2025-08-26T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
-            ]
+            ],
+            // --- ADDED MISSING PARAMETERS ---
+            update_type: nil,
+            activity_date: nil
         ),
         // 2. Neighborhood Cafe - Graded Yesterday
         Restaurant(
@@ -48,7 +51,9 @@ struct PreviewMockData {
                     Violation(violation_code: "04L", violation_description: "Evidence of mice or live mice present in facility's food and/or non-food areas."),
                     Violation(violation_code: "02B", violation_description: "Hot food item not held at or above 140º F.")
                 ])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         ),
         // 3. Side Street Tacos - Graded 2 days ago
         Restaurant(
@@ -67,7 +72,9 @@ struct PreviewMockData {
             google_place_id: nil,
             inspections: [
                 Inspection(inspection_date: "2025-08-24T00:00:00", critical_flag: "Not Critical", grade: "B", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         ),
         // 4. Downtown Diner - Graded 3 days ago
         Restaurant(
@@ -90,7 +97,9 @@ struct PreviewMockData {
                     Violation(violation_code: "06C", violation_description: "Food not protected from potential source of contamination."),
                     Violation(violation_code: "02G", violation_description: "Cold food item held above 41° F.")
                 ])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         ),
         // 5. Uptown Grill - Graded 5 days ago
         Restaurant(
@@ -109,7 +118,9 @@ struct PreviewMockData {
             google_place_id: nil,
             inspections: [
                 Inspection(inspection_date: "2025-08-21T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         ),
         Restaurant(
             camis: "33333333",
@@ -125,7 +136,9 @@ struct PreviewMockData {
             grade_date: nil,
             foursquare_fsq_id: nil,
             google_place_id: nil,
-            inspections: []
+            inspections: [],
+            update_type: nil,
+            activity_date: nil
         ),
         Restaurant(
             camis: "44444444",
@@ -143,9 +156,10 @@ struct PreviewMockData {
             google_place_id: nil,
             inspections: [
                 Inspection(inspection_date: "2025-08-15T00:00:00", critical_flag: "Not Applicable", grade: "N", inspection_type: "Pre-permit (Operational) / Initial Inspection", action: nil, violations: [])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         ),
-
         Restaurant(
             camis: "88888888",
             dba: "The Greasy Spoon",
@@ -164,7 +178,9 @@ struct PreviewMockData {
                 Inspection(inspection_date: "2025-08-25T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Initial Inspection", action: "Establishment Closed by DOHMH. Violations of public health law constitute an imminent health hazard.", violations: [
                      Violation(violation_code: "04L", violation_description: "Evidence of mice or live mice present in facility's food and/or non-food areas.")
                 ])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         ),
         Restaurant(
             camis: "99999999",
@@ -184,7 +200,9 @@ struct PreviewMockData {
                 Inspection(inspection_date: "2025-08-24T00:00:00", critical_flag: "Critical", grade: nil, inspection_type: "Cycle Inspection / Initial Inspection", action: "Establishment Closed by DOHMH.", violations: [
                     Violation(violation_code: "02G", violation_description: "Cold food item held above 41° F.")
                 ])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         ),
         Restaurant(
             camis: "10101010",
@@ -202,7 +220,9 @@ struct PreviewMockData {
             google_place_id: nil,
             inspections: [
                 Inspection(inspection_date: "2025-08-23T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Re-inspection", action: "Establishment Closed by DOHMH due to imminent health hazard.", violations: [])
-            ]
+            ],
+            update_type: nil,
+            activity_date: nil
         )
     ]
 }
