@@ -43,7 +43,7 @@ class APIService {
     private var baseURL: String {
         #if PREVIEW
         // For a new preview branch, just paste the new URL here.
-        return "https://cleanplate-cleanplate-pr-20.up.railway.app"
+        return "https://cleanplate-cleanplate-pr-21.up.railway.app"
         #else
         // Defaults to the production URL for all other builds.
         return "https://cleanplate-production.up.railway.app"

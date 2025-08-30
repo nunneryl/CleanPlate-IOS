@@ -17,7 +17,7 @@ struct RestaurantDetailView: View {
             case .partial(let restaurant), .full(let restaurant):
                 RestaurantContentView(
                     restaurant: restaurant,
-                    isLoading: (viewModel.state.isPartial), // Pass loading state
+                    isLoading: (viewModel.state.isPartial),
                     submitReportAction: { issueType, comments in
                         viewModel.submitReport(for: restaurant, issueType: issueType, comments: comments)
                     }
@@ -59,16 +59,11 @@ struct RestaurantContentView: View {
     @State private var isShowingShareSheet = false
     @State private var isMapVisible = false
     @State private var isShowingReportSheet = false
-    @State private var isShowingSignInSheet = false //
+    @State private var isShowingSignInSheet = false
     
-    // All display logic is now here, pulled from the old ViewModel
     private var name: String { restaurant.dba ?? "Restaurant Name" }
     private var formattedAddress: String { Self.formatAddress(for: restaurant) }
     private var cuisine: String? { restaurant.cuisine_description == "N/A" ? nil : restaurant.cuisine_description }
-    private var headerStatus: (imageName: String, text: String) {
-        let status = Self.calculateCurrentDisplayStatus(for: restaurant)
-        return (imageName: Self.gradeImageName(for: status), text: status)
-    }
     private var inspections: [Inspection] {
         restaurant.inspections?.sorted {
             guard let date1 = DateHelper.parseDate($0.inspection_date), let date2 = DateHelper.parseDate($1.inspection_date) else { return false }
@@ -94,7 +89,6 @@ struct RestaurantContentView: View {
                     Image(systemName: "square.and.arrow.up")
                 }
 
-                // The heart button is now always visible
                 Button(action: {
                     if case .signedIn = authManager.authState {
                         if authManager.isFavorite(restaurant) {
@@ -103,9 +97,8 @@ struct RestaurantContentView: View {
                             authManager.addFavorite(restaurant)
                         }
                     } else {
-                        authManager.signIn {
-                            authManager.addFavorite(restaurant)
-                        }
+                        // Assuming the user wants to be prompted to sign in to favorite
+                        isShowingSignInSheet = true
                     }
                 }) {
                     Image(systemName: authManager.isFavorite(restaurant) ? "heart.fill" : "heart")
@@ -114,7 +107,7 @@ struct RestaurantContentView: View {
             }
         }
         .sheet(isPresented: $isShowingShareSheet) {
-            ShareSheet(items: [Self.buildShareableText(name: name, status: headerStatus.text)])
+            ShareSheet(items: [Self.buildShareableText(for: restaurant)])
         }
         .sheet(isPresented: $isShowingReportSheet) {
             ReportIssueView { issueType, comments in
@@ -122,6 +115,7 @@ struct RestaurantContentView: View {
             }
         }
         .sheet(isPresented: $isShowingSignInSheet) {
+            // This assumes ProfileView handles the sign-in flow
             ProfileView()
         }
         .onAppear {
@@ -134,7 +128,6 @@ struct RestaurantContentView: View {
         }
     }
 
-    // All helper functions for display are now private to the View
     private var headerSection: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 8) {
@@ -150,7 +143,8 @@ struct RestaurantContentView: View {
                 }
             }
             Spacer()
-            Image(headerStatus.imageName)
+            // It now directly uses the smart property from the restaurant model
+            Image(restaurant.displayGradeImageName)
                 .resizable().scaledToFit().frame(width: 72, height: 72)
         }
         .padding(.horizontal)
@@ -158,7 +152,6 @@ struct RestaurantContentView: View {
     
     @ViewBuilder
     private var mapSection: some View {
-        // This view logic doesn't need to change
         if let lat = restaurant.latitude, let lon = restaurant.longitude {
             VStack(spacing: 12) {
                 Button(action: { withAnimation(.easeInOut) { isMapVisible.toggle() } }) {
@@ -192,8 +185,6 @@ struct RestaurantContentView: View {
             }
         }
     }
-    
-    // In file: RestaurantDetailView.swift (inside the RestaurantContentView struct)
 
     private var inspectionList: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -207,7 +198,6 @@ struct RestaurantContentView: View {
             }
             .padding(.horizontal)
 
-            // The ForEach now iterates over the 'inspections' computed property
             if !inspections.isEmpty {
                 ForEach(inspections) { inspection in
                     NavigationLink(destination: InspectionDetailView(inspection: inspection)) {
@@ -215,7 +205,6 @@ struct RestaurantContentView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                     .padding(.horizontal)
-                    // <<< NEW: This makes each new row fade in smoothly >>>
                     .transition(.opacity)
                 }
             } else {
@@ -225,12 +214,10 @@ struct RestaurantContentView: View {
                     .padding()
             }
         }
-        // <<< NEW: This animates the change in the list's size >>>
         .animation(.easeInOut, value: inspections.count)
     }
     
     private func inspectionRow(for inspection: Inspection) -> some View {
-        // This view logic doesn't need to change
         VStack(alignment: .leading, spacing: 10) {
             Text(inspection.formattedDate)
                 .font(.system(size: 16, weight: .semibold))
@@ -315,49 +302,23 @@ struct RestaurantContentView: View {
             .font(.system(size: 16, weight: .semibold)).foregroundColor(.blue).padding(.top, 10)
     }
     
-    // All these static helper functions are now self-contained in the View
+    
     private static func formatAddress(for restaurant: Restaurant) -> String {
         [restaurant.building, restaurant.street, restaurant.boro, restaurant.zipcode].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
     }
     
-    private static func calculateCurrentDisplayStatus(for restaurant: Restaurant) -> String {
-        let sortedInspections = restaurant.inspections?.sorted(by: {
-            guard let date1 = DateHelper.parseDate($0.inspection_date), let date2 = DateHelper.parseDate($1.inspection_date) else { return false }
-            return date1 > date2
-        }) ?? []
-        guard let latestInspection = sortedInspections.first else { return "Not_Graded" }
-        if let action = latestInspection.action?.lowercased(), action.contains("closed by dohmh") { return "Closed" }
-        if let grade = latestInspection.grade {
-            switch grade {
-            case "A", "B", "C": return grade
-            case "Z", "P": return "Grade_Pending"
-            case "N": return "Not_Graded"
-            default: return "Grade_Pending"
-            }
-        } else { return "Grade_Pending" }
-    }
-
-    private static func gradeImageName(for status: String) -> String {
-        switch status {
-        case "A": return "Grade_A"
-        case "B": return "Grade_B"
-        case "C": return "Grade_C"
-        case "Grade_Pending": return "Grade_Pending"
-        case "Closed": return "closed_down"
-        default: return "Not_Graded"
-        }
-    }
-    
-    private static func buildShareableText(name: String, status: String) -> String {
+    private static func buildShareableText(for restaurant: Restaurant) -> String {
         let appStoreLink = "Download CleanPlate to search for any restaurant in NYC: https://apps.apple.com/us/app/cleanplate-nyc/id6745222863"
+        
+        let grade = restaurant.displayGrade ?? "Not Graded"
+        
         let statusText: String
-        switch status {
-        case "A", "B", "C": statusText = "a New York City Department of Health Restaurant Inspection Grade \(status)"
-        case "Grade_Pending": statusText = "a Grade Pending status"
-        case "Closed": statusText = "a Closed by DOHMH status"
+        switch grade {
+        case "A", "B", "C": statusText = "a New York City Department of Health Restaurant Inspection Grade \(grade)"
+        case "Z", "P": statusText = "a Grade Pending status"
         default: statusText = "a 'Not Graded' status"
         }
-        return "Here's the latest NYC health grade for \(name) via the CleanPlate app:\n\nIt currently has \(statusText).\n\nNew to CleanPlate? \(appStoreLink)"
+        return "Here's the latest NYC health grade for \(restaurant.dba ?? "this restaurant") via the CleanPlate app:\n\nIt currently has \(statusText).\n\nNew to CleanPlate? \(appStoreLink)"
     }
     
     private func handleGoogleLink() {

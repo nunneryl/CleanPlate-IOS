@@ -19,13 +19,12 @@ class RecentlyGradedListViewModel: ObservableObject {
     @Published var selectedBoro: BoroOption = .any
     @Published var selectedGrade: GradeOption = .any
     
-    // --- MODIFIED: Simplified to a single list for all recent activity ---
     @Published var recentActivity: [Restaurant] = []
     
     @Published var recentlyClosedRestaurants: [Restaurant] = []
     @Published var recentlyReopenedRestaurants: [Restaurant] = []
     
-    // --- MODIFIED: This now filters the new single list ---
+    // --- MODIFIED: This now filters using the new `displayGrade` property ---
     var filteredRecentActivity: [Restaurant] {
         var filteredList = recentActivity
 
@@ -37,9 +36,10 @@ class RecentlyGradedListViewModel: ObservableObject {
         // Apply Grade Filter
         if selectedGrade != .any {
             if selectedGrade == .pending {
-                filteredList = filteredList.filter { ["P", "Z", "N"].contains($0.mostRecentInspectionGrade ?? "") }
+                // "Grade Pending" can have multiple values
+                filteredList = filteredList.filter { ["P", "Z", "N"].contains($0.displayGrade ?? "") }
             } else {
-                filteredList = filteredList.filter { $0.mostRecentInspectionGrade == selectedGrade.rawValue }
+                filteredList = filteredList.filter { $0.displayGrade == selectedGrade.rawValue }
             }
         }
         
@@ -49,13 +49,11 @@ class RecentlyGradedListViewModel: ObservableObject {
     init() {}
     
     func loadContent() async {
-        // Prevent re-loading if data is already present
         guard recentActivity.isEmpty else { return }
         
         self.state = .loading
         
         do {
-            // --- MODIFIED: Fetch recent activity and actions in parallel ---
             async let activity = APIService.shared.fetchRecentActivity()
             async let actions = APIService.shared.fetchRecentActions()
             

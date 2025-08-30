@@ -505,7 +505,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -523,7 +523,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.1;
+				MARKETING_VERSION = 2.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -643,7 +643,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -661,7 +661,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.1;
+				MARKETING_VERSION = 2.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -837,7 +837,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -855,7 +855,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.1;
+				MARKETING_VERSION = 2.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -875,7 +875,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -893,7 +893,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.1;
+				MARKETING_VERSION = 2.9.2;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

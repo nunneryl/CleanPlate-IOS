@@ -18,15 +18,13 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let foursquare_fsq_id: String?
     let google_place_id: String?
     let inspections: [Inspection]?
+
     let update_type: String?
     let activity_date: String?
 
     var id: String { camis ?? UUID().uuidString }
 
-    // In file: Models.swift
-
     var relativeGradeDate: String {
-        // Use the new activity_date for finalized grades for correct timing, but always use the "Graded" prefix.
         let dateStringToUse = (update_type == "finalized") ? self.activity_date : self.grade_date
         let prefix = "Graded"
         
@@ -99,7 +97,6 @@ struct Inspection: Identifiable, Codable, Equatable {
     var formattedDate: String { DateHelper.formatDate(inspection_date) }
     var hasCriticalViolations: Bool { critical_flag?.lowercased() == "critical" }
     
-
     var displayGradeText: String {
         guard let grade = self.grade, !grade.isEmpty else {
             return "Not Graded"
@@ -136,7 +133,6 @@ struct RecentActionsResponse: Codable {
     let recently_reopened: [Restaurant]
 }
 
-// Represents a single recent search item returned from the API.
 struct RecentSearch: Codable, Identifiable, Equatable {
     let id: Int
     let search_term_display: String
@@ -163,43 +159,61 @@ struct DateHelper {
         return nil
     }
 }
+
 extension Restaurant {
-    var latestFinalGrade: String? {
-        return inspections?
-            .sorted {
-                guard let date1 = $0.inspection_date, let date2 = $1.inspection_date else { return false }
-                return date1 > date2
-            }
-            .first { ["A", "B", "C"].contains($0.grade ?? "") }?
-            .grade
-    }
     
-    var mostRecentInspectionGrade: String? {
-        return inspections?
-            .sorted {
-                guard let date1 = $0.inspection_date, let date2 = $1.inspection_date else { return false }
-                return date1 > date2
-            }
-            .first?
-            .grade
-    }
-    
-    var displayGradeImageName: String {
-        let sortedInspections = inspections?.sorted(by: {
+    /// The sorted list of inspections, from most recent to oldest.
+    private var sortedInspections: [Inspection] {
+        inspections?.sorted(by: {
             guard let date1 = DateHelper.parseDate($0.inspection_date),
                   let date2 = DateHelper.parseDate($1.inspection_date) else { return false }
             return date1 > date2
         }) ?? []
+    }
+    
+    /// The single most recent inspection record.
+    var mostRecentInspection: Inspection? {
+        return sortedInspections.first
+    }
+    
+    /// The single inspection that should be displayed to the user, applying the fallback logic.
+    var displayInspection: Inspection? {
+        guard let latest = mostRecentInspection else { return nil }
         
-        guard let latestInspection = sortedInspections.first else {
+        // If the latest inspection's grade is blank (nil or empty)...
+        if latest.grade == nil || latest.grade?.isEmpty == true {
+            // ...then search for the next most recent inspection that HAS a grade.
+            return sortedInspections.first { insp in
+                let g = insp.grade
+                return g != nil && g?.isEmpty == false
+            }
+        }
+        
+        // Otherwise, just use the latest inspection.
+        return latest
+    }
+        
+    /// The grade from the inspection that should be displayed.
+    var displayGrade: String? {
+        displayInspection?.grade
+    }
+
+    /// The date from the inspection that should be displayed.
+    var displayInspectionDate: String? {
+        displayInspection?.inspection_date
+    }
+    
+    /// The image name for the grade that should be displayed.
+    var displayGradeImageName: String {
+        guard let inspectionToDisplay = displayInspection else {
             return "Not_Graded"
         }
         
-        if let action = latestInspection.action?.lowercased(), action.contains("closed by dohmh") {
+        if let action = inspectionToDisplay.action?.lowercased(), action.contains("closed by dohmh") {
             return "closed_down"
         }
         
-        if let grade = latestInspection.grade {
+        if let grade = inspectionToDisplay.grade {
             switch grade {
             case "A": return "Grade_A"
             case "B": return "Grade_B"
@@ -209,7 +223,7 @@ extension Restaurant {
             default: return "Grade_Pending"
             }
         } else {
-            return "Grade_Pending"
+            return "Not_Graded" // Changed from Grade_Pending for clarity if grade is truly nil
         }
     }
 }

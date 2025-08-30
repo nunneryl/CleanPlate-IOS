@@ -55,7 +55,7 @@ struct DiscoveryCardView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 
-                gradeIcon(for: restaurant.mostRecentInspectionGrade)
+                gradeIcon(for: restaurant.displayGrade)
             }
         }
         .frame(width: 160, height: 100)
@@ -65,29 +65,30 @@ struct DiscoveryCardView: View {
         .shadow(color: .gray.opacity(0.15), radius: 4, x: 0, y: 2)
     }
 
-    @ViewBuilder
-    private func gradeIcon(for grade: String?) -> some View {
-        switch grade?.uppercased() {
-        case "A", "B", "C":
-            if let grade = grade {
-                Image("Grade_\(grade.uppercased())")
+        @ViewBuilder
+        private func gradeIcon(for grade: String?) -> some View {
+            // This function body is the same, but we will now pass `restaurant.displayGrade` to it.
+            switch grade?.uppercased() {
+            case "A", "B", "C":
+                if let grade = grade {
+                    Image("Grade_\(grade.uppercased())")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28, height: 28)
+                }
+            case "P", "Z", "GRADE PENDING", "N": // Added 'N' for consistency
+                Image("Grade_Pending")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 28, height: 28)
+            default:
+                Image("Not_Graded") // Use the Not_Graded image as a fallback
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(.secondary)
             }
-        case "P", "Z", "GRADE PENDING":
-            Image("Grade_Pending")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 28, height: 28)
-        default:
-            Image(systemName: "questionmark.circle")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 28, height: 28)
-                .foregroundColor(.secondary)
         }
-    }
 }
 
 
