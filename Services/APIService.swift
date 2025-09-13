@@ -67,10 +67,6 @@ class APIService {
         return try await buildAndPerformRequest(path: "/search", queryItems: queryItems)
     }
     
-    func fetchRecentActivity() async throws -> [Restaurant] {
-        return try await buildAndPerformRequest(path: "/lists/recent-activity")
-    }
-    
     func fetchRecentActions() async throws -> RecentActionsResponse {
         return try await buildAndPerformRequest(path: "/lists/recent-actions")
     }

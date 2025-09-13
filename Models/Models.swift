@@ -18,33 +18,37 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let foursquare_fsq_id: String?
     let google_place_id: String?
     let inspections: [Inspection]?
-
     let update_type: String?
     let activity_date: String?
+    let finalized_date: String?
 
     var id: String { camis ?? UUID().uuidString }
 
     var relativeGradeDate: String {
-        let dateStringToUse = (update_type == "finalized") ? self.activity_date : self.grade_date
-        let prefix = "Graded"
-        
-        guard let dateStr = dateStringToUse, let date = DateHelper.parseDate(dateStr) else {
-            return "Not Yet Graded"
+            // Prioritize the finalized_date for "Updated from Pending" events.
+            // Fall back to the inspection's date for all other cases.
+            let dateStringToUse = self.finalized_date ?? self.displayInspection?.inspection_date
+            
+            guard let dateStr = dateStringToUse, let date = DateHelper.parseDate(dateStr) else {
+                return "Not Yet Graded"
+            }
+
+            // Use a friendly prefix. For finalized dates, it reads better.
+            let prefix = self.finalized_date != nil ? "Updated" : "Graded"
+            let calendar = Calendar.current
+            
+            if calendar.isDateInToday(date) { return "\(prefix) today" }
+            if calendar.isDateInYesterday(date) { return "\(prefix) yesterday" }
+            
+            let components = calendar.dateComponents([.day], from: date, to: Date())
+            if let day = components.day, day >= 0 && day < 7 {
+                return "\(prefix) \(day + 1) days ago"
+            }
+            
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            return "\(prefix) on \(formatter.string(from: date))"
         }
-        
-        let calendar = Calendar.current
-        if calendar.isDateInToday(date) { return "\(prefix) today" }
-        if calendar.isDateInYesterday(date) { return "\(prefix) yesterday" }
-        
-        let components = calendar.dateComponents([.day], from: date, to: Date())
-        if let day = components.day, day < 30 {
-            return "\(prefix) \(day + 1) days ago"
-        }
-        
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return "\(prefix) on \(formatter.string(from: date))"
-    }
     
     func fullAddress() -> String {
         [building, street, boro, zipcode].compactMap { $0 }.joined(separator: ", ")
@@ -129,6 +133,7 @@ struct Violation: Identifiable, Codable, Equatable {
 }
 
 struct RecentActionsResponse: Codable {
+    let recently_graded: [Restaurant]
     let recently_closed: [Restaurant]
     let recently_reopened: [Restaurant]
 }
@@ -204,13 +209,15 @@ extension Restaurant {
     }
     
     /// The image name for the grade that should be displayed.
+    // In Models.swift, inside extension Restaurant
+
     var displayGradeImageName: String {
-        guard let inspectionToDisplay = displayInspection else {
-            return "Not_Graded"
+        if let latestAction = mostRecentInspection?.action?.lowercased(), latestAction.contains("closed by dohmh") {
+            return "closed_down"
         }
         
-        if let action = inspectionToDisplay.action?.lowercased(), action.contains("closed by dohmh") {
-            return "closed_down"
+        guard let inspectionToDisplay = displayInspection else {
+            return "Not_Graded"
         }
         
         if let grade = inspectionToDisplay.grade {
@@ -223,7 +230,7 @@ extension Restaurant {
             default: return "Grade_Pending"
             }
         } else {
-            return "Not_Graded" // Changed from Grade_Pending for clarity if grade is truly nil
+            return "Not_Graded"
         }
     }
 }

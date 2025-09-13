@@ -54,12 +54,11 @@ class RecentlyGradedListViewModel: ObservableObject {
         self.state = .loading
         
         do {
-            async let activity = APIService.shared.fetchRecentActivity()
-            async let actions = APIService.shared.fetchRecentActions()
+            // Make a single, correct API call
+            let actionResults = try await APIService.shared.fetchRecentActions()
             
-            let (activityResults, actionResults) = try await (activity, actions)
-            
-            self.recentActivity = activityResults
+            // Populate all three lists from the single response
+            self.recentActivity = actionResults.recently_graded
             self.recentlyClosedRestaurants = actionResults.recently_closed
             self.recentlyReopenedRestaurants = actionResults.recently_reopened
             

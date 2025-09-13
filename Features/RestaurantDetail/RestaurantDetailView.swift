@@ -3,6 +3,7 @@
 import SwiftUI
 import os
 import FirebaseAnalytics
+import MapKit
 
 struct RestaurantDetailView: View {
     @StateObject private var viewModel: RestaurantDetailViewModel
@@ -16,6 +17,7 @@ struct RestaurantDetailView: View {
             switch viewModel.state {
             case .partial(let restaurant), .full(let restaurant):
                 RestaurantContentView(
+                    viewModel: viewModel, // Pass the viewModel down to the content view
                     restaurant: restaurant,
                     isLoading: (viewModel.state.isPartial),
                     submitReportAction: { issueType, comments in
@@ -36,22 +38,18 @@ struct RestaurantDetailView: View {
         .navigationTitle("Restaurant Details")
         .navigationBarTitleDisplayMode(.inline)
         .task {
+            // This now triggers both the detail fetch and the map search when the view appears
             await viewModel.loadFullDetailsIfNeeded()
+            await viewModel.fetchCanonicalLocation()
         }
-    }
-}
-
-// Extension to easily check the state
-extension RestaurantDetailViewModel.DetailState {
-    var isPartial: Bool {
-        if case .partial = self { return true }
-        return false
     }
 }
 
 // MARK: - Main Content View
 struct RestaurantContentView: View {
     @EnvironmentObject var authManager: AuthenticationManager
+    @ObservedObject var viewModel: RestaurantDetailViewModel // Receives the viewModel
+    
     let restaurant: Restaurant
     let isLoading: Bool
     let submitReportAction: (ReportIssueView.IssueType, String) -> Void
@@ -62,7 +60,7 @@ struct RestaurantContentView: View {
     @State private var isShowingSignInSheet = false
     
     private var name: String { restaurant.dba ?? "Restaurant Name" }
-    private var formattedAddress: String { Self.formatAddress(for: restaurant) }
+    private var formattedAddress: String { restaurant.fullAddress() }
     private var cuisine: String? { restaurant.cuisine_description == "N/A" ? nil : restaurant.cuisine_description }
     private var inspections: [Inspection] {
         restaurant.inspections?.sorted {
@@ -82,7 +80,8 @@ struct RestaurantContentView: View {
             }
             .padding(.vertical)
         }
-        .background(Color(UIColor.systemBackground).ignoresSafeArea())
+        // --- FIX: Change background to white ---
+        .background(Color.white.ignoresSafeArea())
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: { self.isShowingShareSheet = true }) {
@@ -97,7 +96,6 @@ struct RestaurantContentView: View {
                             authManager.addFavorite(restaurant)
                         }
                     } else {
-                        // Assuming the user wants to be prompted to sign in to favorite
                         isShowingSignInSheet = true
                     }
                 }) {
@@ -115,7 +113,6 @@ struct RestaurantContentView: View {
             }
         }
         .sheet(isPresented: $isShowingSignInSheet) {
-            // This assumes ProfileView handles the sign-in flow
             ProfileView()
         }
         .onAppear {
@@ -143,7 +140,6 @@ struct RestaurantContentView: View {
                 }
             }
             Spacer()
-            // It now directly uses the smart property from the restaurant model
             Image(restaurant.displayGradeImageName)
                 .resizable().scaledToFit().frame(width: 72, height: 72)
         }
@@ -152,20 +148,41 @@ struct RestaurantContentView: View {
     
     @ViewBuilder
     private var mapSection: some View {
-        if let lat = restaurant.latitude, let lon = restaurant.longitude {
-            VStack(spacing: 12) {
-                Button(action: { withAnimation(.easeInOut) { isMapVisible.toggle() } }) {
-                    HStack {
-                        Text(isMapVisible ? "Hide Map" : "Show Map")
-                        Image(systemName: isMapVisible ? "chevron.up" : "chevron.down")
-                    }
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+        VStack(spacing: 12) {
+            Button(action: { withAnimation(.easeInOut) { isMapVisible.toggle() } }) {
+                HStack {
+                    Text(isMapVisible ? "Hide Map" : "Show Map")
+                    Image(systemName: isMapVisible ? "chevron.up" : "chevron.down")
                 }
-                .buttonStyle(.bordered).tint(.blue)
-                
-                if isMapVisible {
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+            }
+            .buttonStyle(.bordered).tint(.blue)
+            
+            if isMapVisible {
+                // This entire section is now driven by the ViewModel's single source of truth
+                if viewModel.isLoadingMap {
+                    ProgressView("Loading Map...")
+                       .frame(height: 200)
+                } else if let mapItem = viewModel.mapItem {
                     VStack(spacing: 0) {
-                        StaticMapView(latitude: lat, longitude: lon, restaurantName: name)
+                        MapSnapshotView(coordinate: mapItem.placemark.coordinate)
+                           .frame(height: 200)
+                        
+                        // Apple Maps Button
+                        Button(action: {
+                            mapItem.openInMaps()
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "apple.logo").font(.title3)
+                                Text("View on Apple Maps").font(.system(size: 15, weight: .semibold, design: .rounded))
+                                Spacer()
+                                Image(systemName: "arrow.up.forward.app.fill").foregroundColor(Color(uiColor: .tertiaryLabel))
+                            }
+                            .padding().background(Color(uiColor: .secondarySystemGroupedBackground))
+                        }
+                        .foregroundColor(.primary)
+
+                        // Google Maps Button
                         if restaurant.google_place_id != nil {
                             Button(action: { handleGoogleLink() }) {
                                 HStack(spacing: 12) {
@@ -181,6 +198,17 @@ struct RestaurantContentView: View {
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 12)).padding(.horizontal)
                     .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
+                } else {
+                    // Fallback view if the map search fails
+                    VStack {
+                        Image(systemName: "mappin.slash.circle")
+                            .font(.title)
+                            .foregroundColor(.secondary)
+                        Text("Map Not Available")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(height: 200)
                 }
             }
         }
@@ -192,8 +220,7 @@ struct RestaurantContentView: View {
                 Text("Inspections")
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                 if isLoading {
-                    ProgressView()
-                        .padding(.leading, 4)
+                    ProgressView().padding(.leading, 4)
                 }
             }
             .padding(.horizontal)
@@ -261,6 +288,7 @@ struct RestaurantContentView: View {
             }
         }
         .padding().frame(maxWidth: .infinity, alignment: .leading)
+        // --- FIX: Ensure inspection row background is systemGray6 ---
         .background(Color(UIColor.systemGray6)).cornerRadius(8)
     }
 
@@ -302,9 +330,8 @@ struct RestaurantContentView: View {
             .font(.system(size: 16, weight: .semibold)).foregroundColor(.blue).padding(.top, 10)
     }
     
-    
     private static func formatAddress(for restaurant: Restaurant) -> String {
-        [restaurant.building, restaurant.street, restaurant.boro, restaurant.zipcode].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
+        return restaurant.fullAddress()
     }
     
     private static func buildShareableText(for restaurant: Restaurant) -> String {

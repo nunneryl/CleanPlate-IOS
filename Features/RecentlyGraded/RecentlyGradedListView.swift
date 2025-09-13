@@ -14,38 +14,42 @@ struct RecentlyGradedListView: View {
     @State private var selectedTab: SelectedTab = .graded
     
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("Select a list", selection: $selectedTab) {
-                ForEach(SelectedTab.allCases, id: \.self) { tab in
-                    Text(tab.rawValue).tag(tab)
+            NavigationView {
+                VStack(spacing: 0) {
+                    Picker("Select a list", selection: $selectedTab) {
+                        ForEach(SelectedTab.allCases, id: \.self) { tab in
+                            Text(tab.rawValue).tag(tab)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+                    
+                    switch viewModel.state {
+                    case .loading:
+                        ProgressView("Loading...")
+                            .frame(maxHeight: .infinity)
+                        
+                    case .error(let errorMessage):
+                        Text(errorMessage)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .frame(maxHeight: .infinity)
+                        
+                    case .success:
+                        successView
+                    }
+                }
+                .background(Color(.systemGroupedBackground))
+                .navigationTitle("Grade & Status Changes")
+                .navigationBarTitleDisplayMode(.inline)
+                .task {
+                    await viewModel.loadContent()
                 }
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
-            .padding(.bottom, 8)
-            
-            switch viewModel.state {
-            case .loading:
-                ProgressView("Loading...")
-                    .frame(maxHeight: .infinity)
-                
-            case .error(let errorMessage):
-                Text(errorMessage)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                    .frame(maxHeight: .infinity)
-                
-            case .success:
-                successView
-            }
+            .navigationViewStyle(.stack)
         }
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("Grade & Status Changes")
-        .task {
-            await viewModel.loadContent()
-        }
-    }
     
     private var successView: some View {
         Form {

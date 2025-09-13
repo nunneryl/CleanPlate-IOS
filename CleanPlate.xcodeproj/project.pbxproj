@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */; };
 		323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323C1CC62E4A722700EB2E2A /* ShareSheet.swift */; };
+		3268C7F72E6A271400C32153 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3268C7F62E6A271400C32153 /* Models.swift */; };
+		3268C7FE2E708C4400C32153 /* MapServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3268C7FD2E708C4400C32153 /* MapServices.swift */; };
+		3268C8012E70C47600C32153 /* MapSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3268C8002E70C47600C32153 /* MapSnapshotView.swift */; };
 		326C9E872DC6A6EB007457E4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 326C9E862DC6A6EB007457E4 /* FirebaseCrashlytics */; };
 		32A22CA92E4BD6670077653F /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A22CA82E4BD6670077653F /* ProfileView.swift */; };
 		32A22CAB2E4BD8DD0077653F /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */; };
@@ -26,8 +29,6 @@
 		32C138CC2D8F67E2006F4121 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C02D8F67E2006F4121 /* APIService.swift */; };
 		32C138CD2D8F67E2006F4121 /* InspectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */; };
 		32C138CE2D8F67E2006F4121 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C62D8F67E2006F4121 /* SearchView.swift */; };
-		32C138CF2D8F67E2006F4121 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C42D8F67E2006F4121 /* Models.swift */; };
-		32C138D02D8F67E2006F4121 /* FAQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138C22D8F67E2006F4121 /* FAQView.swift */; };
 		32C138D42D905217006F4121 /* ViolationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C138D32D905217006F4121 /* ViolationsView.swift */; };
 		32CB03562DB41D0000C8068D /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 32CB03552DB41D0000C8068D /* FirebaseAnalytics */; };
 		32CB03582DB421C800C8068D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32CB03572DB421C800C8068D /* GoogleService-Info.plist */; };
@@ -68,6 +69,9 @@
 /* Begin PBXFileReference section */
 		3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsLogger.swift; sourceTree = "<group>"; };
 		323C1CC62E4A722700EB2E2A /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		3268C7F62E6A271400C32153 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		3268C7FD2E708C4400C32153 /* MapServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapServices.swift; sourceTree = "<group>"; };
+		3268C8002E70C47600C32153 /* MapSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSnapshotView.swift; sourceTree = "<group>"; };
 		329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		32A22CA82E4BD6670077653F /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
@@ -82,9 +86,7 @@
 		32C138BE2D8F671B006F4121 /* CleanPlate-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CleanPlate-Bridging-Header.h"; sourceTree = "<group>"; };
 		32C138BF2D8F67E2006F4121 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		32C138C02D8F67E2006F4121 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
-		32C138C22D8F67E2006F4121 /* FAQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQView.swift; sourceTree = "<group>"; };
 		32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectionDetailView.swift; sourceTree = "<group>"; };
-		32C138C42D8F67E2006F4121 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantDetailView.swift; sourceTree = "<group>"; };
 		32C138C62D8F67E2006F4121 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		32C138C72D8F67E2006F4121 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
@@ -137,6 +139,116 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3268C7ED2E6A264000C32153 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */,
+				32C138B82D8F66CF006F4121 /* MainTabView.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		3268C7EE2E6A268C00C32153 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				3268C7FF2E70C45D00C32153 /* Map */,
+				3268C7FA2E6A300A00C32153 /* RecentlyGraded */,
+				3268C7F92E6A2FD200C32153 /* Search */,
+				3268C7F82E6A2FB400C32153 /* RestaurantDetail */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		3268C7EF2E6A26A100C32153 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3268C7F62E6A271400C32153 /* Models.swift */,
+				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		3268C7F02E6A26A600C32153 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */,
+				32C138C02D8F67E2006F4121 /* APIService.swift */,
+				3268C7FD2E708C4400C32153 /* MapServices.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		3268C7F22E6A26B000C32153 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				32C138BF2D8F67E2006F4121 /* AboutView.swift */,
+				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
+				32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */,
+				32FC37E42E25951400E72886 /* ReportIssueView.swift */,
+				32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */,
+				32C138D32D905217006F4121 /* ViolationsView.swift */,
+				32A22CA82E4BD6670077653F /* ProfileView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		3268C7F32E6A26B500C32153 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */,
+				3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */,
+				32EAB0BC2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift */,
+				32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */,
+				32A22CAE2E4BF80D0077653F /* KeychainHelper.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		3268C7F42E6A26BD00C32153 /* Testing & Previews */ = {
+			isa = PBXGroup;
+			children = (
+				323C1CC62E4A722700EB2E2A /* ShareSheet.swift */,
+				32B1E1C12E5E26DD0085C35D /* ScreenshotDependencies.swift */,
+				32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */,
+			);
+			path = "Testing & Previews";
+			sourceTree = "<group>";
+		};
+		3268C7F82E6A2FB400C32153 /* RestaurantDetail */ = {
+			isa = PBXGroup;
+			children = (
+				32FC37E22E215C2900E72886 /* RestaurantDetailViewModel.swift */,
+				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
+			);
+			path = RestaurantDetail;
+			sourceTree = "<group>";
+		};
+		3268C7F92E6A2FD200C32153 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				32C138C62D8F67E2006F4121 /* SearchView.swift */,
+				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
+		3268C7FA2E6A300A00C32153 /* RecentlyGraded */ = {
+			isa = PBXGroup;
+			children = (
+				32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */,
+				32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */,
+			);
+			path = RecentlyGraded;
+			sourceTree = "<group>";
+		};
+		3268C7FF2E70C45D00C32153 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				3268C8002E70C47600C32153 /* MapSnapshotView.swift */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
 		32A4A5082DC5533500B5E6EE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -148,35 +260,14 @@
 		32D9DA5B2CBDFB7100BA92E1 = {
 			isa = PBXGroup;
 			children = (
-				323C1CC62E4A722700EB2E2A /* ShareSheet.swift */,
+				3268C7F42E6A26BD00C32153 /* Testing & Previews */,
+				3268C7F32E6A26B500C32153 /* Utilities */,
+				3268C7F02E6A26A600C32153 /* Services */,
+				3268C7EF2E6A26A100C32153 /* Models */,
+				3268C7ED2E6A264000C32153 /* Application */,
+				3268C7F22E6A26B000C32153 /* Views */,
+				3268C7EE2E6A268C00C32153 /* Features */,
 				329C8F632D8E0B28000A3C5E /* LaunchScreen.storyboard */,
-				32C138BF2D8F67E2006F4121 /* AboutView.swift */,
-				32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */,
-				3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */,
-				32A4CAE42DF3C89200CC8C37 /* HapticsManager.swift */,
-				32A4CAE82E01A77300CC8C37 /* FilterOptions.swift */,
-				32C138C42D8F67E2006F4121 /* Models.swift */,
-				32EAB0BC2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift */,
-				32FC37E02E1DB32C00E72886 /* PreviewMockData.swift */,
-				32A4CAE62DF60F6400CC8C37 /* ReviewManager.swift */,
-				32C138C02D8F67E2006F4121 /* APIService.swift */,
-				32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */,
-				32A22CAE2E4BF80D0077653F /* KeychainHelper.swift */,
-				32B1E1C12E5E26DD0085C35D /* ScreenshotDependencies.swift */,
-				32C138C22D8F67E2006F4121 /* FAQView.swift */,
-				32A4CAEA2E01A7A700CC8C37 /* FilterSortView.swift */,
-				32C138C32D8F67E2006F4121 /* InspectionDetailView.swift */,
-				32C138B82D8F66CF006F4121 /* MainTabView.swift */,
-				32A22CA82E4BD6670077653F /* ProfileView.swift */,
-				32FC37DC2E1A033E00E72886 /* RecentlyGradedListView.swift */,
-				32C138C52D8F67E2006F4121 /* RestaurantDetailView.swift */,
-				32FC37E42E25951400E72886 /* ReportIssueView.swift */,
-				32C138C62D8F67E2006F4121 /* SearchView.swift */,
-				32DB85142E0F364C00CCE5D5 /* StaticMapView.swift */,
-				32C138D32D905217006F4121 /* ViolationsView.swift */,
-				32FC37E22E215C2900E72886 /* RestaurantDetailViewModel.swift */,
-				32C138C72D8F67E2006F4121 /* SearchViewModel.swift */,
-				32FC37DE2E1A056200E72886 /* RecentlyGradedListViewModel.swift */,
 				32D9DA662CBDFB7200BA92E1 /* CleanPlate */,
 				32D9DA772CBDFB7900BA92E1 /* NYCFoodRatingsTests */,
 				32D9DA812CBDFB7900BA92E1 /* NYCFoodRatingsUITests */,
@@ -377,10 +468,12 @@
 				3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */,
 				32C138CA2D8F67E2006F4121 /* AboutView.swift in Sources */,
 				32C138CB2D8F67E2006F4121 /* RestaurantDetailView.swift in Sources */,
+				3268C7FE2E708C4400C32153 /* MapServices.swift in Sources */,
 				32B1E1C22E5E26DD0085C35D /* ScreenshotDependencies.swift in Sources */,
 				32A22CAB2E4BD8DD0077653F /* AuthenticationManager.swift in Sources */,
 				32A22CA92E4BD6670077653F /* ProfileView.swift in Sources */,
 				323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */,
+				3268C8012E70C47600C32153 /* MapSnapshotView.swift in Sources */,
 				32A4CAE92E01A77300CC8C37 /* FilterOptions.swift in Sources */,
 				32C138D42D905217006F4121 /* ViolationsView.swift in Sources */,
 				32C138CC2D8F67E2006F4121 /* APIService.swift in Sources */,
@@ -389,14 +482,13 @@
 				32C138CE2D8F67E2006F4121 /* SearchView.swift in Sources */,
 				32FC37E12E1DB32C00E72886 /* PreviewMockData.swift in Sources */,
 				32A4CAE72DF60F6400CC8C37 /* ReviewManager.swift in Sources */,
-				32C138CF2D8F67E2006F4121 /* Models.swift in Sources */,
 				32EAB0BD2E2FEC9E002078AF /* GoogleMapsDeepLinker.swift in Sources */,
-				32C138D02D8F67E2006F4121 /* FAQView.swift in Sources */,
 				32FC37E52E25951500E72886 /* ReportIssueView.swift in Sources */,
 				32C138BC2D8F66CF006F4121 /* MainTabView.swift in Sources */,
 				32A4CAEB2E01A7A700CC8C37 /* FilterSortView.swift in Sources */,
 				32DB85152E0F364C00CCE5D5 /* StaticMapView.swift in Sources */,
 				32FC37DD2E1A033E00E72886 /* RecentlyGradedListView.swift in Sources */,
+				3268C7F72E6A271400C32153 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -505,7 +597,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -523,7 +615,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.2;
+				MARKETING_VERSION = 2.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -643,7 +735,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -661,7 +753,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.2;
+				MARKETING_VERSION = 2.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -837,7 +929,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -855,7 +947,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.2;
+				MARKETING_VERSION = 2.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -875,7 +967,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleanPlate/CleanPlate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_ASSET_PATHS = "\"CleanPlate/Preview Content\"";
 				DEVELOPMENT_TEAM = JZXVT367QR;
 				ENABLE_PREVIEWS = YES;
@@ -893,7 +985,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.9.2;
+				MARKETING_VERSION = 2.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nunzo.CleanPlate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

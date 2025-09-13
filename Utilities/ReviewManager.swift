@@ -15,11 +15,11 @@ class ReviewManager {
     // Create a shared instance so we can access it easily from anywhere.
     static let shared = ReviewManager()
     private init() {}
-
+    
     // We'll use UserDefaults to keep track of how many times the user has
     // performed a key action.
     private let userDefaultsKey = "restaurantDetailViewCount"
-
+    
     /// Increments a counter and requests an App Store review when appropriate.
     ///
     /// This method should be called when the user completes a meaningful action,
@@ -35,23 +35,31 @@ class ReviewManager {
         // 3. Save the new count back to device storage.
         UserDefaults.standard.set(newCount, forKey: userDefaultsKey)
         
-        // 4. Define the thresholds for when to ask for a review.
-        // We'll ask after the 3rd, 10th, and 30th restaurant they've viewed.
-        // Apple will only show the prompt a maximum of 3 times per year.
-        let reviewThresholds: [Int] = [3, 10, 30]
+        // 4. Define the initial thresholds for new users.
+        let initialThresholds: [Int] = [3, 10, 30]
         
-        // 5. Check if the new count matches one of our thresholds.
-        guard reviewThresholds.contains(newCount) else {
-            // If it's not a threshold count, we do nothing.
+        // 5. Check if the new count matches an initial threshold OR a recurring one.
+        var shouldRequestReview = false
+        if initialThresholds.contains(newCount) {
+            // It's a new user hitting an early milestone.
+            shouldRequestReview = true
+        } else if newCount > 30 && newCount % 50 == 0 {
+            // It's an engaged user hitting a recurring milestone (50, 100, 150, etc.).
+            shouldRequestReview = true
+        }
+        
+        // If it's not a threshold count, we do nothing.
+        guard shouldRequestReview else {
             return
         }
-
+        
         // 6. Find the active window scene to present the review request.
         guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
             return
         }
-
-        // 7. Request the review. iOS will decide if it's the right time to show the pop-up.
+        
+        // 7. Request the review. iOS will still only show the prompt a max of 3 times per year.
         SKStoreReviewController.requestReview(in: scene)
     }
 }
+

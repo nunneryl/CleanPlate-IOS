@@ -38,10 +38,10 @@ struct MainTabView: View {
                 }
                 .tag(0)
             
-            FoodSafetyFAQView()
+            RecentlyGradedListView()
                 .tabItem {
                     Image(systemName: "fork.knife")
-                    Text("Food Safety")
+                    Text("Grade Updates")
                 }
                 .tag(1)
             

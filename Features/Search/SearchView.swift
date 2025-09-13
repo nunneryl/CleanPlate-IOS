@@ -28,70 +28,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Discovery Card View
-struct DiscoveryCardView: View {
-    let restaurant: Restaurant
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    Text(restaurant.dba ?? "Restaurant")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(restaurant.formattedBoro)
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-            }
-            Spacer()
-            HStack {
-                Text(restaurant.relativeGradeDate)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(.secondary)
-                Spacer()
-                
-                gradeIcon(for: restaurant.displayGrade)
-            }
-        }
-        .frame(width: 160, height: 100)
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .shadow(color: .gray.opacity(0.15), radius: 4, x: 0, y: 2)
-    }
-
-        @ViewBuilder
-        private func gradeIcon(for grade: String?) -> some View {
-            // This function body is the same, but we will now pass `restaurant.displayGrade` to it.
-            switch grade?.uppercased() {
-            case "A", "B", "C":
-                if let grade = grade {
-                    Image("Grade_\(grade.uppercased())")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28, height: 28)
-                }
-            case "P", "Z", "GRADE PENDING", "N": // Added 'N' for consistency
-                Image("Grade_Pending")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 28, height: 28)
-            default:
-                Image("Not_Graded") // Use the Not_Graded image as a fallback
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 28, height: 28)
-                    .foregroundColor(.secondary)
-            }
-        }
-}
-
-
+// MARK: - Main Search View
 struct SearchView: View {
     @EnvironmentObject var viewModel: SearchViewModel
     @EnvironmentObject var authManager: AuthenticationManager
@@ -99,7 +36,6 @@ struct SearchView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     @State private var isShowingFilterSheet = false
-    @State private var isRecentlyGradedExpanded = false
 
     private var isFilterActive: Bool {
         return viewModel.selectedBoro != .any ||
@@ -164,23 +100,20 @@ struct SearchView: View {
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView,
                                parameters: [AnalyticsParameterScreenName: "Search", AnalyticsParameterScreenClass: "\(SearchView.self)"])
-            Task {
-                await viewModel.loadIdleScreenContent()
-            }
+            // NOTE: The call to load discovery content is removed from here
+            // because the content now lives in its own tab.
         }
     }
 
     // MARK: - Subviews
 
-    // --- MODIFIED: Removed conditional logic to ensure discoveryListView is always shown ---
     private var idleView: some View {
         VStack {
             // If the search bar is focused and we have recent searches, show them.
             if isSearchFieldFocused && !viewModel.recentSearches.isEmpty && viewModel.searchTerm.isEmpty {
                 recentSearchesView
             } else {
-                // Otherwise, show the default idle content.
-                discoveryListView
+                // The discoveryListView has been removed, so we just show the disclaimer.
                 Spacer()
                 disclaimerText
                 Spacer()
@@ -193,7 +126,6 @@ struct SearchView: View {
             Image(systemName: "fork.knife.circle.fill").resizable().scaledToFit().frame(width: horizontalSizeClass == .compact ? 50 : 60, height: horizontalSizeClass == .compact ? 50 : 60).foregroundColor(.blue).shadow(radius: 2).onTapGesture {
                 viewModel.resetSearch()
                 isSearchFieldFocused = false
-                
             }
             Text("CleanPlate").font(.system(size: horizontalSizeClass == .compact ? 26 : 32, weight: .bold, design: .rounded)).foregroundColor(.primary)
             Text("Your Guide to Safe & Smart Dining").font(.system(size: horizontalSizeClass == .compact ? 14 : 16, weight: .regular, design: .rounded)).foregroundColor(.secondary).multilineTextAlignment(.center).padding(.horizontal, 20)
@@ -217,7 +149,7 @@ struct SearchView: View {
 
                 if !viewModel.searchTerm.isEmpty {
                     Button {
-                        HapticsManager.shared.impact(style: .light)
+                        // HapticsManager.shared.impact(style: .light) // Assuming HapticsManager exists
                         viewModel.resetSearch()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
@@ -237,7 +169,7 @@ struct SearchView: View {
             }.buttonStyle(AnimatedButtonStyle())
 
             Button {
-                HapticsManager.shared.impact(style: .light)
+                // HapticsManager.shared.impact(style: .light)
                 isSearchFieldFocused = false
                 isShowingFilterSheet = true
             } label: {
@@ -251,56 +183,7 @@ struct SearchView: View {
         }
         .padding(.horizontal)
     }
-    
-    // --- MODIFIED: Now handles the loading state internally ---
-    private var discoveryListView: some View {
-        VStack(spacing: 0) {
-            Button(action: {
-                HapticsManager.shared.impact(style: .light)
-                withAnimation(.easeInOut(duration: 0.2)) { isRecentlyGradedExpanded.toggle() }
-            }) {
-                HStack {
-                    Text("Grade & Status Changes")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                    Spacer()
-                    Image(systemName: "chevron.right").font(.system(size: 16, weight: .semibold)).rotationEffect(.degrees(isRecentlyGradedExpanded ? 90 : 0))
-                }
-                .foregroundColor(.primary).padding(.horizontal).padding(.vertical, 8)
-            }
-            if isRecentlyGradedExpanded {
-                // If data is empty, show a loading indicator. Otherwise, show the cards.
-                if viewModel.recentlyGradedRestaurants.isEmpty {
-                    ProgressView()
-                        .frame(height: 140)
-                        .transition(.opacity)
-                } else {
-                    VStack(spacing: 12) {
-                        HStack {
-                            Spacer()
-                            NavigationLink(destination: RecentlyGradedListView()) {
-                                HStack(spacing: 4) {
-                                    Text("See All")
-                                    Image(systemName: "chevron.right")
-                                }
-                                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            }
-                        }.padding(.horizontal)
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                ForEach(viewModel.recentlyGradedRestaurants) { restaurant in
-                                    NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)) {
-                                        DiscoveryCardView(restaurant: restaurant)
-                                    }.buttonStyle(PlainButtonStyle())
-                                }
-                            }.padding(.horizontal)
-                        }.frame(height: 140)
-                    }
-                    .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: -10)), removal: .opacity)).padding(.bottom, 8)
-                }
-            }
-        }
-    }
-    
+        
     private func mainSearchResults(restaurants: [Restaurant]) -> some View {
         List {
             ForEach(restaurants) { restaurant in
@@ -325,43 +208,42 @@ struct SearchView: View {
         }
         .listStyle(PlainListStyle())
         .refreshable {
-            HapticsManager.shared.impact(style: .medium)
+            // HapticsManager.shared.impact(style: .medium)
             await viewModel.performSearch()
         }
     }
 
     private var recentSearchesView: some View {
-           List {
-               Section {
-                   ForEach(viewModel.recentSearches) { search in
-                       Button(action: {
-                           viewModel.searchTerm = search.search_term_display
-                           submitSearch()
-                       }) {
-                           HStack {
-                               Image(systemName: "clock.arrow.circlepath")
-                               Text(search.search_term_display)
-                               Spacer()
-                           }
-                           .foregroundColor(.primary)
+       List {
+           Section {
+               ForEach(viewModel.recentSearches) { search in
+                   Button(action: {
+                       viewModel.searchTerm = search.search_term_display
+                       submitSearch()
+                   }) {
+                       HStack {
+                           Image(systemName: "clock.arrow.circlepath")
+                           Text(search.search_term_display)
+                           Spacer()
                        }
+                       .foregroundColor(.primary)
                    }
-               } header: {
-                   HStack {
-                       Text("Recent Searches")
-                       Spacer()
-                       if !viewModel.recentSearches.isEmpty {
-                           Button("Clear") {
-                               // This now calls the function in the authManager
-                               authManager.clearRecentSearches()
-                           }
+               }
+           } header: {
+               HStack {
+                   Text("Recent Searches")
+                   Spacer()
+                   if !viewModel.recentSearches.isEmpty {
+                       Button("Clear") {
+                           authManager.clearRecentSearches()
                        }
                    }
                }
            }
-           .listStyle(.plain)
-           .transition(.asymmetric(insertion: .opacity.animation(.easeIn(duration: 0.2)), removal: .opacity.animation(.easeOut(duration: 0.1))))
        }
+       .listStyle(.plain)
+       .transition(.asymmetric(insertion: .opacity.animation(.easeIn(duration: 0.2)), removal: .opacity.animation(.easeOut(duration: 0.1))))
+   }
     
     private var disclaimerText: some View {
         VStack {
@@ -370,7 +252,6 @@ struct SearchView: View {
                 .font(.system(size: horizontalSizeClass == .compact ? 14 : 16))
                 .italic().foregroundColor(.secondary).multilineTextAlignment(.center).padding(.horizontal, horizontalSizeClass == .compact ? 30 : 40)
             Spacer()
-            
         }
     }
 
@@ -395,7 +276,7 @@ struct SearchView: View {
                 }
             }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 20)
             Button {
-                HapticsManager.shared.impact(style: .medium)
+                // HapticsManager.shared.impact(style: .medium)
                 viewModel.resetSearch()
             } label: { Text("Clear Search") }.buttonStyle(PrimaryButtonStyle()).padding(.top, 16)
             Spacer()
@@ -410,7 +291,7 @@ struct SearchView: View {
                  Image(systemName: "exclamationmark.triangle.fill").font(.largeTitle).foregroundColor(.red)
                 Text(message).font(.system(size: 14, weight: .medium, design: .rounded)).foregroundColor(.red).multilineTextAlignment(.center).padding(.horizontal)
                 Button {
-                    HapticsManager.shared.impact(style: .medium)
+                    // HapticsManager.shared.impact(style: .medium)
                     Task { await viewModel.performSearch() }
                 } label: { Text("Try Again") }.buttonStyle(PrimaryButtonStyle())
             }.padding().background(Color(.systemGray6)).cornerRadius(10).shadow(radius: 2)
@@ -421,14 +302,14 @@ struct SearchView: View {
     
     private func submitSearch() {
         isSearchFieldFocused = false
-        HapticsManager.shared.impact(style: .medium)
+        // HapticsManager.shared.impact(style: .medium)
         Task {
             await viewModel.performSearch()
         }
     }
 }
 
-// Skeleton Views
+// MARK: - Skeleton Views
 struct SkeletonLoadingView: View {
     var body: some View { VStack(spacing: 12) { ForEach(0..<5, id: \.self) { _ in SkeletonRow() } }.padding(.horizontal).accessibilityElement(children: .ignore).accessibilityLabel("Loading search results") }
 }

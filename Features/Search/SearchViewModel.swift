@@ -105,28 +105,35 @@ class SearchViewModel: ObservableObject {
     }
     
     func loadIdleScreenContent() async {
-        if case .success = self.state { return }
+        // Prevent re-loading if we already have data or are in a search
+        if !recentlyGradedRestaurants.isEmpty || hasPerformedSearch { return }
         guard !isLoadingDiscovery else { return }
-        self.isLoadingDiscovery = true
         
-        // --- MODIFIED: Changed to call the new unified endpoint ---
-        async let activityTask = APIService.shared.fetchRecentActivity()
-        async let recentSearchesTask: () = self.fetchRecentSearches()
+        self.isLoadingDiscovery = true
+        logger.info("--> Starting to fetch home screen data from APIService.shared.fetchRecentActivity()...")
         
         do {
-            let restaurants = try await activityTask
-            // Use the same property, but only take the first 10 for the home screen preview
-            self.recentlyGradedRestaurants = Array(restaurants.prefix(10))
-            logger.info("Successfully loaded \(self.recentlyGradedRestaurants.count) recent activity items for idle screen.")
+            // Make the correct API call
+            let response = try await APIService.shared.fetchRecentActions()
+            // Use the recently_graded list from the response
+            self.recentlyGradedRestaurants = Array(response.recently_graded.prefix(10))
+            logger.info("--> SUCCESS: Loaded \(self.recentlyGradedRestaurants.count) restaurants for home screen.")
+            
+            // This log will prove the data is correct and recent
+            if let firstRestaurant = self.recentlyGradedRestaurants.first {
+                let updateType = firstRestaurant.update_type ?? "nil"
+                let activityDate = firstRestaurant.activity_date ?? "nil"
+                logger.info("--> First restaurant DBA: \(firstRestaurant.dba ?? "N/A"), Update Type: \(updateType), Activity Date: \(activityDate)")
+            }
+            
         } catch {
-            logger.error("Failed to load recent activity list: \(error.localizedDescription)")
+            logger.error("--> ERROR loading home screen content: \(error.localizedDescription)")
         }
         
-        await recentSearchesTask
-        
         self.isLoadingDiscovery = false
+        await self.fetchRecentSearches()
     }
-
+    
     func resetSearch() {
             searchTerm = ""
             state = .idle
