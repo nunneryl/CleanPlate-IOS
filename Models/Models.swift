@@ -207,10 +207,40 @@ extension Restaurant {
     var displayInspectionDate: String? {
         displayInspection?.inspection_date
     }
-    
-    /// The image name for the grade that should be displayed.
-    // In Models.swift, inside extension Restaurant
 
+    var relativeActionDate: String {
+            guard let inspection = mostRecentInspection,
+                  let actionText = inspection.action?.lowercased(),
+                  let dateStr = inspection.inspection_date,
+                  let date = DateHelper.parseDate(dateStr) else {
+                return "Status date not available"
+            }
+
+            let prefix: String
+            if actionText.contains("closed") {
+                prefix = "Closed"
+            } else if actionText.contains("re-opened") {
+                prefix = "Re-opened"
+            } else {
+                // Fallback for any unexpected action text
+                return "Status updated \(DateHelper.formatDate(dateStr))"
+            }
+            
+            let calendar = Calendar.current
+            if calendar.isDateInToday(date) { return "\(prefix) today" }
+            if calendar.isDateInYesterday(date) { return "\(prefix) yesterday" }
+            
+            let components = calendar.dateComponents([.day], from: date, to: Date())
+            if let day = components.day, day >= 0 && day < 30 {
+                if day == 0 { return "\(prefix) today" }
+                return "\(prefix) \(day + 1) days ago"
+            }
+            
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            return "\(prefix) on \(formatter.string(from: date))"
+        }
+    
     var displayGradeImageName: String {
         if let latestAction = mostRecentInspection?.action?.lowercased(), latestAction.contains("closed by dohmh") {
             return "closed_down"

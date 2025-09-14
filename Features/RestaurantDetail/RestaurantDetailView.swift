@@ -80,8 +80,8 @@ struct RestaurantContentView: View {
             }
             .padding(.vertical)
         }
-        // --- FIX: Change background to white ---
-        .background(Color.white.ignoresSafeArea())
+    
+        .background(Color(.systemBackground).ignoresSafeArea())
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: { self.isShowingShareSheet = true }) {

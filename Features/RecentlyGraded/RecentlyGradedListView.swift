@@ -67,71 +67,86 @@ struct RecentlyGradedListView: View {
                     }
                 }
             }
-            
-            // --- MODIFIED: Simplified switch statement ---
+
             switch selectedTab {
-            case .graded:
-                contentSection(for: viewModel.filteredRecentActivity, // Use the new filtered list
-                               emptyMessage: "No recently graded restaurants match your filters.")
-            case .closed:
-                contentSection(for: viewModel.recentlyClosedRestaurants,
-                               emptyMessage: "No restaurants were recently closed by the DOHMH.",
-                               header: "Recently Closed by DOHMH",
-                               icon: "exclamationmark.triangle.fill", color: .red)
-            case .reopened:
-                contentSection(for: viewModel.recentlyReopenedRestaurants,
-                               emptyMessage: "No recently closed restaurants have re-opened.",
-                               header: "Recently Re-opened",
-                               icon: "checkmark.circle.fill", color: .green)
-            }
+                        case .graded:
+                            contentSection(for: viewModel.filteredRecentActivity,
+                                           emptyMessage: "No recently graded restaurants match your filters.",
+                                           tab: .graded) // <-- Pass tab
+                        case .closed:
+                            contentSection(for: viewModel.recentlyClosedRestaurants,
+                                           emptyMessage: "No restaurants were recently closed by the DOHMH.",
+                                           header: "Recently Closed by DOHMH",
+                                           icon: "exclamationmark.triangle.fill", color: .red,
+                                           tab: .closed) // <-- Pass tab
+                        case .reopened:
+                            contentSection(for: viewModel.recentlyReopenedRestaurants,
+                                           emptyMessage: "No recently closed restaurants have re-opened.",
+                                           header: "Recently Re-opened",
+                                           icon: "checkmark.circle.fill", color: .green,
+                                           tab: .reopened) // <-- Pass tab
+                        }
         }
     }
     
     @ViewBuilder
-    private func contentSection(for restaurants: [Restaurant], emptyMessage: String, header: String? = nil, icon: String? = nil, color: Color? = nil) -> some View {
-        Section(header: header != nil ? Text(header!) : nil) {
-            if restaurants.isEmpty {
-                Text(emptyMessage)
-                    .foregroundColor(.secondary)
-            } else {
-                ForEach(restaurants) { restaurant in
-                    NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)) {
-                        restaurantRowView(restaurant: restaurant, icon: icon, color: color)
+        private func contentSection(for restaurants: [Restaurant], emptyMessage: String, header: String? = nil, icon: String? = nil, color: Color? = nil, tab: SelectedTab) -> some View {
+            Section(header: header != nil ? Text(header!) : nil) {
+                if restaurants.isEmpty {
+                    Text(emptyMessage)
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(restaurants) { restaurant in
+                        NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)) {
+                            // Pass the tab parameter down to the row view
+                            restaurantRowView(restaurant: restaurant, icon: icon, color: color, tab: tab)
+                        }
                     }
                 }
             }
         }
-    }
     
-    private func restaurantRowView(restaurant: Restaurant, icon: String? = nil, color: Color? = nil) -> some View {
-        HStack {
-            if let iconName = icon, let iconColor = color {
-                Image(systemName: iconName)
-                    .foregroundColor(iconColor)
-                    .font(.headline)
-            }
-            VStack(alignment: .leading, spacing: 4) {
-                Text(restaurant.dba ?? "Unknown")
-                    .fontWeight(.semibold)
-                
-                Text("\(restaurant.formattedStreet), \(restaurant.formattedBoro)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                // Reverted to the gray, italicized, more descriptive subtitle
-                if restaurant.update_type == "finalized" {
-                    Text("Updated from Grade Pending")
-                        .font(.caption)
-                        .italic()
-                        .foregroundColor(.secondary) // Changed back to gray
+    private func restaurantRowView(restaurant: Restaurant, icon: String? = nil, color: Color? = nil, tab: SelectedTab) -> some View {
+            HStack {
+                if let iconName = icon, let iconColor = color {
+                    Image(systemName: iconName)
+                        .foregroundColor(iconColor)
+                        .font(.headline)
                 }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(restaurant.dba ?? "Unknown")
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    
+                    Text("\(restaurant.formattedStreet), \(restaurant.formattedBoro)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    // --- THIS IS THE NEW LOGIC ---
+                    // It displays the correct text based on the selected tab
+                    switch tab {
+                    case .graded:
+                        if restaurant.update_type == "finalized" {
+                            Text("Updated from Grade Pending")
+                                .font(.caption)
+                                .italic()
+                                .foregroundColor(.secondary)
+                        }
+                        Text(restaurant.relativeGradeDate)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    case .closed, .reopened:
+                        Text(restaurant.relativeActionDate)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                Spacer()
+                Image(restaurant.displayGradeImageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
             }
-            Spacer()
-            Image(restaurant.displayGradeImageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 30, height: 30)
+            .padding(.vertical, 6)
         }
-        .padding(.vertical, 6)
-    }
 }
