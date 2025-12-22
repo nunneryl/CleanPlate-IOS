@@ -47,7 +47,7 @@ class RestaurantDetailViewModel: ObservableObject {
             self.state = .full(fullRestaurantDetails)
         } catch {
             let apiError = error as? APIError ?? .unknown
-            self.state = .error(apiError.description)
+            self.state = .error(apiError.localizedDescription)
         }
     }
     

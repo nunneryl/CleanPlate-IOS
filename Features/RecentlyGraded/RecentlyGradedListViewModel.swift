@@ -65,7 +65,7 @@ class RecentlyGradedListViewModel: ObservableObject {
             self.state = .success
             
         } catch {
-            let errorMessage = (error as? APIError)?.description ?? "An unknown error occurred."
+            let errorMessage = (error as? APIError)?.localizedDescription ?? "An unknown error occurred."
             self.state = .error(errorMessage)
         }
     }

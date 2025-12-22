@@ -1,11 +1,11 @@
 import Foundation
 
-enum Environment {
+enum AppEnvironment {
     case development
     case preview
     case production
     
-    static var current: Environment {
+    static var current: AppEnvironment {
         #if DEBUG
         // Check for preview scheme
         if ProcessInfo.processInfo.environment["PREVIEW_MODE"] == "1" {
@@ -20,7 +20,7 @@ enum Environment {
 
 struct Config {
     static var apiBaseURL: String {
-        switch Environment.current {
+        switch AppEnvironment.current {
         case .development:
             return "https://cleanplate-production.up.railway.app"  // Or localhost for local dev
         case .preview:
@@ -32,6 +32,6 @@ struct Config {
     
     // Add other environment-specific config here
     static var enableLogging: Bool {
-        Environment.current != .production
+        AppEnvironment.current != .production
     }
 }
