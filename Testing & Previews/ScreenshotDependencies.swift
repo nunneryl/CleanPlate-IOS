@@ -23,15 +23,11 @@ class MockAPIService: APIService {
         return Array(PreviewMockData.mockRestaurants.prefix(5))
     }
     
-    // --- REPLACED fetchRecentlyGraded with fetchRecentActivity to match the new API design ---
-    override func fetchRecentActivity() async throws -> [Restaurant] {
-        try await Task.sleep(nanoseconds: mockNetworkDelay)
-        // For screenshots, just return the whole mock list as if it's all recent.
-        return PreviewMockData.mockRestaurants
-    }
-    
     override func fetchRecentActions() async throws -> RecentActionsResponse {
         try await Task.sleep(nanoseconds: mockNetworkDelay)
+        
+        // Return mock recently graded restaurants
+        let gradedRestaurants = PreviewMockData.mockRestaurants
         
         let closedRestaurants = PreviewMockData.mockRestaurants.filter { restaurant in
             guard let latestInspection = restaurant.inspections?.sorted(by: { $0.inspection_date ?? "" > $1.inspection_date ?? "" }).first else {
@@ -40,7 +36,7 @@ class MockAPIService: APIService {
             return latestInspection.action?.lowercased().contains("closed by dohmh") ?? false
         }
         
-        return RecentActionsResponse(recently_closed: closedRestaurants, recently_reopened: [])
+        return RecentActionsResponse(recently_graded: gradedRestaurants, recently_closed: closedRestaurants, recently_reopened: [])
     }
     
     override func fetchRestaurantDetails(camis: String) async throws -> Restaurant {

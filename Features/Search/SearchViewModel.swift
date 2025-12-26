@@ -213,7 +213,7 @@ class SearchViewModel: ObservableObject {
             canLoadMorePages = newRestaurants.count == perPage
             
         } catch {
-            let errorMessage = (error as? APIError)?.description ?? "An unknown error occurred."
+            let errorMessage = (error as? APIError)?.localizedDescription ?? "An unknown error occurred."
             state = .error(errorMessage)
             canLoadMorePages = false
             Analytics.logEvent("search_error", parameters: ["search_term": searchTerm, "error_message": errorMessage])

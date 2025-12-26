@@ -26,9 +26,9 @@ struct PreviewMockData {
             inspections: [
                 Inspection(inspection_date: "2025-08-26T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ],
-            // --- ADDED MISSING PARAMETERS ---
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
         // 2. Neighborhood Cafe - Graded Yesterday
         Restaurant(
@@ -53,7 +53,8 @@ struct PreviewMockData {
                 ])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
         // 3. Side Street Tacos - Graded 2 days ago
         Restaurant(
@@ -74,7 +75,8 @@ struct PreviewMockData {
                 Inspection(inspection_date: "2025-08-24T00:00:00", critical_flag: "Not Critical", grade: "B", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
         // 4. Downtown Diner - Graded 3 days ago
         Restaurant(
@@ -99,7 +101,8 @@ struct PreviewMockData {
                 ])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
         // 5. Uptown Grill - Graded 5 days ago
         Restaurant(
@@ -120,8 +123,10 @@ struct PreviewMockData {
                 Inspection(inspection_date: "2025-08-21T00:00:00", critical_flag: "Not Critical", grade: "A", inspection_type: "Cycle Inspection / Initial Inspection", action: nil, violations: [])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
+        // 6. Test Kitchen
         Restaurant(
             camis: "33333333",
             dba: "Test Kitchen",
@@ -138,8 +143,10 @@ struct PreviewMockData {
             google_place_id: nil,
             inspections: [],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
+        // 7. City Bistro (No Grade Yet)
         Restaurant(
             camis: "44444444",
             dba: "City Bistro (No Grade Yet)",
@@ -158,8 +165,10 @@ struct PreviewMockData {
                 Inspection(inspection_date: "2025-08-15T00:00:00", critical_flag: "Not Applicable", grade: "N", inspection_type: "Pre-permit (Operational) / Initial Inspection", action: nil, violations: [])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
+        // 8. The Greasy Spoon - Closed
         Restaurant(
             camis: "88888888",
             dba: "The Greasy Spoon",
@@ -180,8 +189,10 @@ struct PreviewMockData {
                 ])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
+        // 9. Sanitation Optional Sushi - Closed
         Restaurant(
             camis: "99999999",
             dba: "Sanitation Optional Sushi",
@@ -202,8 +213,10 @@ struct PreviewMockData {
                 ])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         ),
+        // 10. Forgotten Deli - Closed
         Restaurant(
             camis: "10101010",
             dba: "Forgotten Deli",
@@ -222,7 +235,8 @@ struct PreviewMockData {
                 Inspection(inspection_date: "2025-08-23T00:00:00", critical_flag: "Critical", grade: "C", inspection_type: "Cycle Inspection / Re-inspection", action: "Establishment Closed by DOHMH due to imminent health hazard.", violations: [])
             ],
             update_type: nil,
-            activity_date: nil
+            activity_date: nil,
+            finalized_date: nil
         )
     ]
 }
