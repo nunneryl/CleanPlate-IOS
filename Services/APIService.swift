@@ -2,6 +2,7 @@
 
 import Foundation
 import os
+import Security
 
 enum APIError: Error {
     case invalidURL
@@ -9,8 +10,9 @@ enum APIError: Error {
     case serverError(Int)
     case decodingError(Error)
     case noData
+    case sslPinningFailed
     case unknown
-    
+
     var description: String {
         switch self {
         case .invalidURL:
@@ -23,6 +25,8 @@ enum APIError: Error {
             return "Failed to process server data: \(error.localizedDescription)"
         case .noData:
             return "No data was received from the server."
+        case .sslPinningFailed:
+            return "SSL certificate validation failed."
         case .unknown:
             return "An unknown error occurred."
         }
@@ -35,10 +39,60 @@ struct AuthTokenProvider {
     static var token: String?
 }
 
+// MARK: - SSL Pinning Delegate
+class SSLPinningDelegate: NSObject, URLSessionDelegate {
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "SSLPinning")
+
+    // Allowed hosts for SSL pinning
+    private let pinnedHosts = [
+        "cleanplate-production.up.railway.app",
+        "cleanplate-cleanplate-pr-21.up.railway.app"
+    ]
+
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+              let serverTrust = challenge.protectionSpace.serverTrust,
+              let host = challenge.protectionSpace.host as String? else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+
+        // Only apply pinning to our API hosts
+        guard pinnedHosts.contains(host) || host.contains("railway.app") else {
+            // For other hosts (like Apple APIs), use default handling
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        // Validate the certificate chain
+        var error: CFError?
+        let isValid = SecTrustEvaluateWithError(serverTrust, &error)
+
+        if isValid {
+            let credential = URLCredential(trust: serverTrust)
+            completionHandler(.useCredential, credential)
+            logger.info("SSL validation successful for \(host, privacy: .public)")
+        } else {
+            logger.error("SSL validation failed for \(host, privacy: .public): \(error?.localizedDescription ?? "Unknown error", privacy: .public)")
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+    }
+}
+
 class APIService {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "APIService")
     static var shared = APIService()
-    
+
+    // Custom URLSession with SSL pinning
+    private let sslPinningDelegate = SSLPinningDelegate()
+    private lazy var session: URLSession = {
+        let configuration = URLSessionConfiguration.default
+        configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
+        configuration.tlsMaximumSupportedProtocolVersion = .TLSv13
+        return URLSession(configuration: configuration, delegate: sslPinningDelegate, delegateQueue: nil)
+    }()
+
     public init() {}
     private var baseURL: String {
         #if PREVIEW
@@ -141,7 +195,7 @@ class APIService {
     }
 
     private func performRequest<T: Decodable>(request: URLRequest) async throws -> T {
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else { throw APIError.unknown }
         guard (200...299).contains(httpResponse.statusCode) else { throw APIError.serverError(httpResponse.statusCode) }
         if T.self == EmptyResponse.self { return EmptyResponse() as! T }
