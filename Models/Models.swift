@@ -14,6 +14,7 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let latitude: Double?
     let longitude: Double?
     let cuisine_description: String?
+    let grade: String?  // Top-level grade for list views
     let grade_date: String?
     let foursquare_fsq_id: String?
     let google_place_id: String?
@@ -199,8 +200,9 @@ extension Restaurant {
     }
         
     /// The grade from the inspection that should be displayed.
+    /// Falls back to top-level grade for list views (Grade Updates).
     var displayGrade: String? {
-        displayInspection?.grade
+        displayInspection?.grade ?? self.grade
     }
 
     /// The date from the inspection that should be displayed.
@@ -245,22 +247,21 @@ extension Restaurant {
         if let latestAction = mostRecentInspection?.action?.lowercased(), latestAction.contains("closed by dohmh") {
             return "closed_down"
         }
-        
-        guard let inspectionToDisplay = displayInspection else {
+
+        // Try inspection grade first, fall back to top-level grade for list views
+        let gradeToUse = displayInspection?.grade ?? self.grade
+
+        guard let grade = gradeToUse, !grade.isEmpty else {
             return "Not_Graded"
         }
-        
-        if let grade = inspectionToDisplay.grade {
-            switch grade {
-            case "A": return "Grade_A"
-            case "B": return "Grade_B"
-            case "C": return "Grade_C"
-            case "Z", "P": return "Grade_Pending"
-            case "N": return "Not_Graded"
-            default: return "Grade_Pending"
-            }
-        } else {
-            return "Not_Graded"
+
+        switch grade {
+        case "A": return "Grade_A"
+        case "B": return "Grade_B"
+        case "C": return "Grade_C"
+        case "Z", "P": return "Grade_Pending"
+        case "N": return "Not_Graded"
+        default: return "Grade_Pending"
         }
     }
 }
