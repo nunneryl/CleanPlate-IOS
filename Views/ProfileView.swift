@@ -20,12 +20,6 @@ struct ProfileView: View {
                 }
             }
             .navigationTitle("Profile")
-            // This tells the view to refresh its data every time it appears
-            .onAppear {
-                Task {
-                    await authManager.fetchRecentSearches()
-                }
-            }
         }
         .navigationViewStyle(.stack)
     }
@@ -87,35 +81,6 @@ struct ProfileView: View {
                         let restaurantToDelete = favoritedRestaurants[index]
                         authManager.removeFavorite(restaurantToDelete)
                     }
-                }
-            }
-            
-            // RECENT SEARCHES SECTION
-            Section {
-                // The list of recent searches
-                ForEach(authManager.recentSearches) { search in
-                    HStack {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .foregroundColor(.secondary)
-                        Text(search.search_term_display)
-                    }
-                }
-            } header: {
-                // Section header with the new "Clear" button
-                HStack {
-                    Text("Recent Searches")
-                    Spacer()
-                    if !authManager.recentSearches.isEmpty {
-                        Button("Clear") {
-                            authManager.clearRecentSearches()
-                        }
-                    }
-                }
-            } footer: {
-                // Show a footer if the list is empty
-                if authManager.recentSearches.isEmpty {
-                    Text("Your recent searches will appear here.")
-                        .padding(.vertical, 4)
                 }
             }
             

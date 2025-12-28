@@ -100,8 +100,9 @@ struct SearchView: View {
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView,
                                parameters: [AnalyticsParameterScreenName: "Search", AnalyticsParameterScreenClass: "\(SearchView.self)"])
-            // NOTE: The call to load discovery content is removed from here
-            // because the content now lives in its own tab.
+            Task {
+                await viewModel.fetchRecentSearches()
+            }
         }
     }
 
