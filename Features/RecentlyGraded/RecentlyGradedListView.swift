@@ -122,20 +122,8 @@ struct RecentlyGradedListView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     
-                    // --- THIS IS THE NEW LOGIC ---
-                    // It displays the correct text based on the selected tab
-                    switch tab {
-                    case .graded:
-                        if restaurant.update_type == "finalized" {
-                            Text("Updated from Grade Pending")
-                                .font(.caption)
-                                .italic()
-                                .foregroundColor(.secondary)
-                        }
-                        Text(restaurant.relativeGradeDate)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    case .closed, .reopened:
+                    // Only show date for closed/reopened tabs, not for graded tab
+                    if tab == .closed || tab == .reopened {
                         Text(restaurant.relativeActionDate)
                             .font(.caption)
                             .foregroundColor(.secondary)
