@@ -96,7 +96,7 @@ class SSLPinningDelegate: NSObject, URLSessionDelegate {
     // Allowed hosts for SSL pinning
     private let pinnedHosts = [
         "cleanplate-production.up.railway.app",
-        "cleanplate-cleanplate-pr-21.up.railway.app"
+        "cleanplate-cleanplate-pr-24.up.railway.app"
     ]
 
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
