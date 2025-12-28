@@ -156,17 +156,18 @@ class SearchViewModel: ObservableObject {
     
     func fetchRecentSearches() async {
         guard let token = AuthTokenProvider.token else {
-            self.recentSearches = []
+            // No token - user not signed in, don't clear existing data
+            logger.info("No auth token available for fetching recent searches.")
             return
         }
-        
+
         do {
             let searches = try await APIService.shared.fetchRecentSearches(token: token)
             self.recentSearches = searches
             logger.info("Successfully loaded \(searches.count) recent searches.")
         } catch {
+            // Don't clear on error - keep existing data
             logger.error("Failed to load recent searches: \(error.localizedDescription)")
-            self.recentSearches = []
         }
     }
     
