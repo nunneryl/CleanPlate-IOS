@@ -62,8 +62,31 @@ enum APIError: LocalizedError {
 
 struct EmptyResponse: Decodable {}
 
-struct AuthTokenProvider {
-    static var token: String?
+/// Thread-safe token storage for authentication
+final class AuthTokenProvider {
+    static let shared = AuthTokenProvider()
+
+    private var _token: String?
+    private let lock = NSLock()
+
+    private init() {}
+
+    static var token: String? {
+        get { shared.getToken() }
+        set { shared.setToken(newValue) }
+    }
+
+    private func getToken() -> String? {
+        lock.lock()
+        defer { lock.unlock() }
+        return _token
+    }
+
+    private func setToken(_ newValue: String?) {
+        lock.lock()
+        defer { lock.unlock() }
+        _token = newValue
+    }
 }
 
 // MARK: - SSL Pinning Delegate

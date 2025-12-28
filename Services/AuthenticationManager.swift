@@ -2,6 +2,7 @@
 
 import Foundation
 import AuthenticationServices
+import os
 
 // A notification name to broadcast when recent searches are cleared.
 extension Notification.Name {
@@ -10,18 +11,19 @@ extension Notification.Name {
 
 @MainActor
 class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
-    
+
     enum AuthState {
         case signedOut
         case signedIn(userID: String)
     }
-    
+
     @Published var authState: AuthState = .signedOut
     @Published var favorites: [String: Restaurant] = [:]
     @Published var recentSearches: [RecentSearch] = []
-    
+
     private var identityToken: String?
     private var postSignInAction: (() -> Void)?
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "AuthenticationManager")
     
     override init() {
         super.init()
@@ -34,7 +36,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
                 await fetchFavorites()
                 await fetchRecentSearches()
             }
-            print("User is already signed in with ID: \(userID)")
+            logger.info("User is already signed in with ID: \(userID, privacy: .private)")
         }
     }
     
@@ -58,24 +60,24 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
             self.recentSearches = [] // Clear searches on sign out
             self.identityToken = nil
             AuthTokenProvider.token = nil
-            print("User successfully signed out.")
+            logger.info("User successfully signed out.")
         } catch {
-            print("Error signing out: \(error)")
+            logger.error("Error signing out: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     func deleteAccount() async {
         guard let token = self.identityToken else {
-            print("Error: Cannot delete account without an identity token.")
+            logger.error("Cannot delete account without an identity token.")
             return
         }
         
         do {
             try await APIService.shared.deleteUser(token: token)
             signOut()
-            print("User account deleted successfully.")
+            logger.info("User account deleted successfully.")
         } catch {
-            print("Error deleting user account: \(error)")
+            logger.error("Error deleting user account: \(error.localizedDescription, privacy: .public)")
         }
     }
     
@@ -94,7 +96,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
             }
             self.favorites = favoritesDict
         } catch {
-            print("Error fetching favorites: \(error)")
+            logger.error("Error fetching favorites: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -104,7 +106,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
             let searches = try await APIService.shared.fetchRecentSearches(token: token)
             self.recentSearches = searches
         } catch {
-            print("Error fetching recent searches: \(error)")
+            logger.error("Error fetching recent searches: \(error.localizedDescription, privacy: .public)")
         }
     }
     
@@ -121,7 +123,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
                    NotificationCenter.default.post(name: .didClearRecentSearches, object: nil)
                } catch {
                    self.recentSearches = oldSearches
-                   print("Error clearing recent searches: \(error)")
+                   logger.error("Error clearing recent searches: \(error.localizedDescription, privacy: .public)")
                }
            }
        }
@@ -135,7 +137,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
                 try await APIService.shared.addFavorite(camis: camis, token: token)
             } catch {
                 self.favorites.removeValue(forKey: camis)
-                print("Error adding favorite: \(error)")
+                logger.error("Error adding favorite: \(error.localizedDescription, privacy: .public)")
             }
         }
     }
@@ -148,7 +150,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
                 try await APIService.shared.removeFavorite(camis: camis, token: token)
             } catch {
                 self.favorites[camis] = restaurant
-                print("Error removing favorite: \(error)")
+                logger.error("Error removing favorite: \(error.localizedDescription, privacy: .public)")
             }
         }
     }
@@ -164,7 +166,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let identityTokenData = appleIDCredential.identityToken,
               let identityToken = String(data: identityTokenData, encoding: .utf8) else {
-            print("Error: Missing or invalid identity token.")
+            logger.error("Missing or invalid identity token.")
             postSignInAction = nil
             return
         }
@@ -174,7 +176,7 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
         Task {
             do {
                 try await APIService.shared.createUser(identityToken: identityToken)
-                print("Successfully created user on our backend.")
+                logger.info("Successfully created user on our backend.")
                 
                 try KeychainHelper.save(userID: userID)
                 try KeychainHelper.save(token: identityToken)
@@ -192,14 +194,14 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
                 self.postSignInAction = nil
                 
             } catch {
-                print("Error during sign in process: \(error)")
+                logger.error("Error during sign in process: \(error.localizedDescription, privacy: .public)")
                 self.postSignInAction = nil
             }
         }
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        print("Sign in with Apple failed with error: \(error.localizedDescription)")
+        logger.error("Sign in with Apple failed: \(error.localizedDescription, privacy: .public)")
     }
     
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {

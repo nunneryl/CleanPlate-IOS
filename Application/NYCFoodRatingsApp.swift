@@ -6,7 +6,9 @@ import FirebaseCore
 
 @main
 struct NYCFoodRatingsApp: App {
-    
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "App")
+
     #if SCREENSHOTS
     @StateObject private var authManager = MockAuthenticationManager()
     #else
@@ -16,10 +18,10 @@ struct NYCFoodRatingsApp: App {
     init() {
         #if SCREENSHOTS
         APIService.shared = MockAPIService()
-        print("🚀 App starting in SCREENSHOT mode with mock data.")
+        Self.logger.info("App starting in SCREENSHOT mode with mock data.")
         #else
         FirebaseApp.configure()
-        print("🔥 App starting in LIVE mode.")
+        Self.logger.info("App starting in LIVE mode.")
         #endif
     }
 

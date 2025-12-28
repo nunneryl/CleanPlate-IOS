@@ -2,11 +2,13 @@
 
 import SwiftUI
 import MapKit
+import os
 
 struct MapSnapshotView: View {
     let coordinate: CLLocationCoordinate2D
-    
+
     @State private var snapshotImage: UIImage? = nil
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "MapSnapshot")
 
     var body: some View {
         Group {
@@ -41,7 +43,7 @@ struct MapSnapshotView: View {
         
         snapshotter.start { (snapshot, error) in
             if let error = error {
-                print("ERROR: Snapshot generation failed: \(error.localizedDescription)")
+                logger.error("Snapshot generation failed: \(error.localizedDescription, privacy: .public)")
                 return
             }
             
