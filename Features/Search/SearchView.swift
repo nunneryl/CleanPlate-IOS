@@ -104,6 +104,13 @@ struct SearchView: View {
                 await viewModel.fetchRecentSearches()
             }
         }
+        .onChange(of: authManager.isSignedIn) { isSignedIn in
+            if isSignedIn {
+                Task {
+                    await viewModel.fetchRecentSearches()
+                }
+            }
+        }
     }
 
     // MARK: - Subviews
