@@ -104,8 +104,8 @@ struct SearchView: View {
                 await viewModel.fetchRecentSearches()
             }
         }
-        .onChange(of: authManager.isSignedIn) { isSignedIn in
-            if isSignedIn {
+        .onChange(of: authManager.authState) { newState in
+            if case .signedIn = newState {
                 Task {
                     await viewModel.fetchRecentSearches()
                 }

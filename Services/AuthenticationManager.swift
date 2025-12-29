@@ -12,7 +12,7 @@ extension Notification.Name {
 @MainActor
 class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
 
-    enum AuthState {
+    enum AuthState: Equatable {
         case signedOut
         case signedIn(userID: String)
     }
