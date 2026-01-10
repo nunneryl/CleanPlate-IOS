@@ -243,6 +243,31 @@ extension Restaurant {
             return "\(prefix) on \(formatter.string(from: date))"
         }
     
+    /// Returns "Grade updated X days ago" text ONLY for B/C restaurants from the recently graded list.
+    /// A grades don't need this since they're assigned same day as inspection.
+    var gradeUpdatedLabel: String? {
+        // Only show for restaurants from the recently graded list (update_type is set)
+        guard update_type != nil else { return nil }
+
+        // Only show for B or C grades (A grades are assigned immediately)
+        guard let currentGrade = displayGrade, currentGrade == "B" || currentGrade == "C" else { return nil }
+
+        // Use grade_date for the label
+        guard let dateStr = grade_date, let date = DateHelper.parseDate(dateStr) else { return nil }
+
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return "Grade updated today" }
+        if calendar.isDateInYesterday(date) { return "Grade updated yesterday" }
+
+        let components = calendar.dateComponents([.day], from: date, to: Date())
+        if let day = components.day, day >= 0 {
+            if day == 0 { return "Grade updated today" }
+            return "Grade updated \(day + 1) days ago"
+        }
+
+        return nil
+    }
+    
     var displayGradeImageName: String {
         if let latestAction = mostRecentInspection?.action?.lowercased(), latestAction.contains("closed by dohmh") {
             return "closed_down"

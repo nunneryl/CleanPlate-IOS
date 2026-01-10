@@ -24,7 +24,7 @@ struct Config {
         case .development:
             return "https://cleanplate-production.up.railway.app"  // Or localhost for local dev
         case .preview:
-            return "https://cleanplate-cleanplate-pr-24.up.railway.app"
+            return "https://cleanplate-cleanplate-pr-25.up.railway.app"
         case .production:
             return "https://cleanplate-production.up.railway.app"
         }

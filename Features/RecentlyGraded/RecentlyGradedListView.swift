@@ -61,7 +61,7 @@ struct RecentlyGradedListView: View {
                         }
                     }
                     Picker("Grade", selection: $viewModel.selectedGrade) {
-                        ForEach(GradeOption.allCases.filter { $0 != .closed }) { option in
+                        ForEach(GradeOption.allCases.filter { $0 != .closed && $0 != .pending }) { option in
                             Text(option.displayName).tag(option)
                         }
                     }

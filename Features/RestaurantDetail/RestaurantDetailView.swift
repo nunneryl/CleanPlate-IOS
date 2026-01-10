@@ -17,7 +17,7 @@ struct RestaurantDetailView: View {
             switch viewModel.state {
             case .partial(let restaurant), .full(let restaurant):
                 RestaurantContentView(
-                    viewModel: viewModel, // Pass the viewModel down to the content view
+                    viewModel: viewModel,
                     restaurant: restaurant,
                     isLoading: (viewModel.state.isPartial),
                     submitReportAction: { issueType, comments in
@@ -38,12 +38,12 @@ struct RestaurantDetailView: View {
         .navigationTitle("Restaurant Details")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            // This now triggers both the detail fetch and the map search when the view appears
             await viewModel.loadFullDetailsIfNeeded()
-            await viewModel.fetchCanonicalLocation()
+            await viewModel.fetchMapData()
         }
     }
 }
+
 
 // MARK: - Main Content View
 struct RestaurantContentView: View {
@@ -140,11 +140,20 @@ struct RestaurantContentView: View {
                 }
             }
             Spacer()
-            Image(restaurant.displayGradeImageName)
-                .resizable().scaledToFit().frame(width: 72, height: 72)
+            VStack(spacing: 4) {
+                Image(restaurant.displayGradeImageName)
+                    .resizable().scaledToFit().frame(width: 72, height: 72)
+                // Show "Grade updated X days ago" only for B/C restaurants from recently graded list
+                if let gradeLabel = restaurant.gradeUpdatedLabel {
+                    Text(gradeLabel)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+            }
         }
         .padding(.horizontal)
     }
+
     
     @ViewBuilder
     private var mapSection: some View {
@@ -157,21 +166,19 @@ struct RestaurantContentView: View {
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
             }
             .buttonStyle(.bordered).tint(.blue)
-            
+
             if isMapVisible {
-                // This entire section is now driven by the ViewModel's single source of truth
                 if viewModel.isLoadingMap {
                     ProgressView("Loading Map...")
                        .frame(height: 200)
-                } else if let mapItem = viewModel.mapItem {
+                } else if let coordinate = viewModel.displayCoordinate {
+                    // Use NYC coordinates for display (most reliable)
                     VStack(spacing: 0) {
-                        MapSnapshotView(coordinate: mapItem.placemark.coordinate)
+                        MapSnapshotView(coordinate: coordinate)
                            .frame(height: 200)
-                        
-                        // Apple Maps Button
-                        Button(action: {
-                            mapItem.openInMaps()
-                        }) {
+
+                        // Apple Maps Button - always available with coordinates
+                        Button(action: { handleAppleMapsLink() }) {
                             HStack(spacing: 12) {
                                 Image(systemName: "apple.logo").font(.title3)
                                 Text("View on Apple Maps").font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -182,24 +189,22 @@ struct RestaurantContentView: View {
                         }
                         .foregroundColor(.primary)
 
-                        // Google Maps Button
-                        if restaurant.google_place_id != nil {
-                            Button(action: { handleGoogleLink() }) {
-                                HStack(spacing: 12) {
-                                    Image("logo_google").resizable().aspectRatio(contentMode: .fit).frame(width: 24, height: 24)
-                                    Text("View on Google Maps").font(.system(size: 15, weight: .semibold, design: .rounded))
-                                    Spacer()
-                                    Image(systemName: "arrow.up.forward.app.fill").foregroundColor(Color(uiColor: .tertiaryLabel))
-                                }
-                                .padding().background(Color(uiColor: .secondarySystemGroupedBackground))
+                        // Google Maps Button - always available (uses Place ID or coordinates)
+                        Button(action: { handleGoogleLink() }) {
+                            HStack(spacing: 12) {
+                                Image("logo_google").resizable().aspectRatio(contentMode: .fit).frame(width: 24, height: 24)
+                                Text("View on Google Maps").font(.system(size: 15, weight: .semibold, design: .rounded))
+                                Spacer()
+                                Image(systemName: "arrow.up.forward.app.fill").foregroundColor(Color(uiColor: .tertiaryLabel))
                             }
-                            .foregroundColor(.primary)
+                            .padding().background(Color(uiColor: .secondarySystemGroupedBackground))
                         }
+                        .foregroundColor(.primary)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 12)).padding(.horizontal)
                     .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
                 } else {
-                    // Fallback view if the map search fails
+                    // No coordinates available
                     VStack {
                         Image(systemName: "mappin.slash.circle")
                             .font(.title)
@@ -211,6 +216,13 @@ struct RestaurantContentView: View {
                     .frame(height: 200)
                 }
             }
+        }
+    }
+
+    private func handleAppleMapsLink() {
+        Analytics.logEvent("tap_external_link", parameters: ["platform": "apple", "restaurant_id": restaurant.camis ?? "unknown"])
+        if let mapItem = viewModel.getAppleMapItem() {
+            mapItem.openInMaps()
         }
     }
 
@@ -349,10 +361,14 @@ struct RestaurantContentView: View {
     }
     
     private func handleGoogleLink() {
-        guard let placeID = restaurant.google_place_id, let placeName = restaurant.dba else { return }
         Analytics.logEvent("tap_external_link", parameters: ["platform": "google", "restaurant_id": restaurant.camis ?? "unknown"])
-        GoogleMapsDeepLinker.openGoogleMaps(for: placeID, placeName: placeName)
+        GoogleMapsDeepLinker.openGoogleMaps(
+            placeID: restaurant.google_place_id,
+            placeName: restaurant.dba ?? "Restaurant",
+            coordinate: viewModel.displayCoordinate
+        )
     }
+
 
     private func formattedGrade(_ gradeCode: String?) -> String {
         guard let grade = gradeCode, !grade.isEmpty else { return "Not Graded" }
