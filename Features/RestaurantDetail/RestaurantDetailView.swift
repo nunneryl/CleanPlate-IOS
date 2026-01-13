@@ -138,6 +138,7 @@ struct RestaurantContentView: View {
                         .font(.system(size: 14, weight: .regular, design: .rounded))
                         .foregroundColor(.secondary)
                 }
+
             }
             Spacer()
             VStack(spacing: 4) {
@@ -365,9 +366,15 @@ struct RestaurantContentView: View {
         GoogleMapsDeepLinker.openGoogleMaps(
             placeID: restaurant.google_place_id,
             placeName: restaurant.dba ?? "Restaurant",
+            building: restaurant.building,
+            street: restaurant.street,
+            borough: restaurant.boro,
+            zipcode: restaurant.zipcode,
             coordinate: viewModel.displayCoordinate
         )
     }
+
+
 
 
     private func formattedGrade(_ gradeCode: String?) -> String {
