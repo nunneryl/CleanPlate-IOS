@@ -150,9 +150,15 @@ class RestaurantDetailViewModel: ObservableObject {
                     inspections: fullRestaurantDetails.inspections,
                     update_type: partialRestaurant.update_type,
                     activity_date: fullRestaurantDetails.activity_date,
-                    finalized_date: fullRestaurantDetails.finalized_date
+                    finalized_date: fullRestaurantDetails.finalized_date,
+                    google_rating: fullRestaurantDetails.google_rating,
+                    google_review_count: fullRestaurantDetails.google_review_count,
+                    website: fullRestaurantDetails.website,
+                    hours: fullRestaurantDetails.hours,
+                    price_level: fullRestaurantDetails.price_level
                 )
             }
+
             self.state = .full(fullRestaurantDetails)
         } catch {
             let apiError = error as? APIError ?? .unknown

@@ -3,7 +3,7 @@
 import Foundation
 import SwiftUI
 
-struct Restaurant: Identifiable, Codable, Equatable {
+struct Restaurant: Identifiable, Equatable {
     let camis: String?
     let dba: String?
     let boro: String?
@@ -22,6 +22,13 @@ struct Restaurant: Identifiable, Codable, Equatable {
     let update_type: String?
     let activity_date: String?
     let finalized_date: String?
+
+    // Google enrichment data
+    let google_rating: Double?
+    let google_review_count: Int?
+    let website: String?
+    let hours: OpeningHours?
+    let price_level: String?
 
     var id: String { camis ?? UUID().uuidString }
 
@@ -90,17 +97,76 @@ struct Restaurant: Identifiable, Codable, Equatable {
     }
 }
 
+
+// MARK: - Restaurant Codable Conformance
+extension Restaurant: Codable {
+    enum CodingKeys: String, CodingKey {
+        case camis, dba, boro, building, street, zipcode, phone
+        case latitude, longitude, cuisine_description
+        case grade, grade_date
+        case foursquare_fsq_id, google_place_id
+        case inspections, update_type, activity_date, finalized_date
+        case google_rating, google_review_count, website, hours, price_level
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        camis = try container.decodeIfPresent(String.self, forKey: .camis)
+        dba = try container.decodeIfPresent(String.self, forKey: .dba)
+        boro = try container.decodeIfPresent(String.self, forKey: .boro)
+        building = try container.decodeIfPresent(String.self, forKey: .building)
+        street = try container.decodeIfPresent(String.self, forKey: .street)
+        zipcode = try container.decodeIfPresent(String.self, forKey: .zipcode)
+        phone = try container.decodeIfPresent(String.self, forKey: .phone)
+        latitude = try container.decodeIfPresent(Double.self, forKey: .latitude)
+        longitude = try container.decodeIfPresent(Double.self, forKey: .longitude)
+        cuisine_description = try container.decodeIfPresent(String.self, forKey: .cuisine_description)
+        grade = try container.decodeIfPresent(String.self, forKey: .grade)
+        grade_date = try container.decodeIfPresent(String.self, forKey: .grade_date)
+        foursquare_fsq_id = try container.decodeIfPresent(String.self, forKey: .foursquare_fsq_id)
+        google_place_id = try container.decodeIfPresent(String.self, forKey: .google_place_id)
+        inspections = try container.decodeIfPresent([Inspection].self, forKey: .inspections)
+        update_type = try container.decodeIfPresent(String.self, forKey: .update_type)
+        activity_date = try container.decodeIfPresent(String.self, forKey: .activity_date)
+        finalized_date = try container.decodeIfPresent(String.self, forKey: .finalized_date)
+        
+        // Handle google_rating which might come as Double or String from the backend
+        if let rating = try? container.decodeIfPresent(Double.self, forKey: .google_rating) {
+            google_rating = rating
+        } else if let ratingString = try? container.decodeIfPresent(String.self, forKey: .google_rating),
+                  let rating = Double(ratingString) {
+            google_rating = rating
+        } else {
+            google_rating = nil
+        }
+        
+        google_review_count = try container.decodeIfPresent(Int.self, forKey: .google_review_count)
+        website = try container.decodeIfPresent(String.self, forKey: .website)
+        hours = try container.decodeIfPresent(OpeningHours.self, forKey: .hours)
+        price_level = try container.decodeIfPresent(String.self, forKey: .price_level)
+    }
+}
+
 struct Inspection: Identifiable, Codable, Equatable {
     var id: String { inspection_date ?? UUID().uuidString }
     let inspection_date: String?
     let critical_flag: String?
     let grade: String?
+    let grade_date: String?
+    let score: Int?
     let inspection_type: String?
     let action: String?
     let violations: [Violation]?
     
     var formattedDate: String { DateHelper.formatDate(inspection_date) }
     var hasCriticalViolations: Bool { critical_flag?.lowercased() == "critical" }
+    
+    /// Formatted score display
+    var displayScore: String? {
+        guard let score = score else { return nil }
+        return "\(score) points"
+    }
     
     var displayGradeText: String {
         guard let grade = self.grade, !grade.isEmpty else {
@@ -127,10 +193,52 @@ struct Inspection: Identifiable, Codable, Equatable {
     }
 }
 
+
 struct Violation: Identifiable, Codable, Equatable {
     var id: String { violation_code ?? UUID().uuidString }
     let violation_code: String?
     let violation_description: String?
+}
+
+// MARK: - Google Hours Data
+struct OpeningHours: Equatable {
+    let openNow: Bool?
+    let periods: [Period]?
+    let weekdayDescriptions: [String]?
+
+    struct Period: Codable, Equatable {
+        let open: TimePoint?
+        let close: TimePoint?
+
+        struct TimePoint: Codable, Equatable {
+            let day: Int?
+            let hour: Int?
+            let minute: Int?
+        }
+    }
+}
+
+// Custom Codable for OpeningHours to handle various Google API response formats
+extension OpeningHours: Codable {
+    enum CodingKeys: String, CodingKey {
+        case openNow
+        case periods
+        case weekdayDescriptions
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        openNow = try container.decodeIfPresent(Bool.self, forKey: .openNow)
+        periods = try container.decodeIfPresent([Period].self, forKey: .periods)
+        weekdayDescriptions = try container.decodeIfPresent([String].self, forKey: .weekdayDescriptions)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(openNow, forKey: .openNow)
+        try container.encodeIfPresent(periods, forKey: .periods)
+        try container.encodeIfPresent(weekdayDescriptions, forKey: .weekdayDescriptions)
+    }
 }
 
 struct RecentActionsResponse: Codable {
@@ -267,7 +375,7 @@ extension Restaurant {
 
         return nil
     }
-    
+
     var displayGradeImageName: String {
         if let latestAction = mostRecentInspection?.action?.lowercased(), latestAction.contains("closed by dohmh") {
             return "closed_down"
@@ -287,6 +395,75 @@ extension Restaurant {
         case "Z", "P": return "Grade_Pending"
         case "N": return "Not_Graded"
         default: return "Grade_Pending"
+        }
+    }
+
+    // MARK: - Google Data Helpers
+
+    /// Formats the price level as dollar signs (e.g., "$$")
+    var displayPriceLevel: String? {
+        guard let level = price_level else { return nil }
+        switch level {
+        case "PRICE_LEVEL_FREE": return "Free"
+        case "PRICE_LEVEL_INEXPENSIVE": return "$"
+        case "PRICE_LEVEL_MODERATE": return "$$"
+        case "PRICE_LEVEL_EXPENSIVE": return "$$$"
+        case "PRICE_LEVEL_VERY_EXPENSIVE": return "$$$$"
+        default: return nil
+        }
+    }
+
+    /// Formatted rating string with star (e.g., "4.3 ★")
+    var displayRating: String? {
+        guard let rating = google_rating else { return nil }
+        return String(format: "%.1f", rating)
+    }
+
+    /// Formatted review count (e.g., "(847 reviews)")
+    var displayReviewCount: String? {
+        guard let count = google_review_count, count > 0 else { return nil }
+        if count == 1 {
+            return "(1 review)"
+        }
+        return "(\(count) reviews)"
+    }
+
+    /// Whether the restaurant is currently open
+    var isOpenNow: Bool? {
+        return hours?.openNow
+    }
+
+    /// Status text for open/closed
+    var openStatusText: String? {
+        guard let isOpen = hours?.openNow else { return nil }
+        return isOpen ? "Open now" : "Closed"
+    }
+    
+    /// Returns the closing time for today (e.g., "9 PM")
+    var closingTimeText: String? {
+        guard let periods = hours?.periods, !periods.isEmpty else { return nil }
+        
+        // Get current day of week (1 = Sunday, 2 = Monday, ... 7 = Saturday)
+        // Google uses 0 = Sunday, 1 = Monday, ... 6 = Saturday
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: Date())
+        let googleWeekday = weekday - 1  // Convert to Google's format
+        
+        // Find today's period
+        guard let todayPeriod = periods.first(where: { $0.open?.day == googleWeekday }),
+              let closeTime = todayPeriod.close,
+              let hour = closeTime.hour else {
+            return nil
+        }
+        
+        // Format the hour (e.g., 21 -> "9 PM")
+        let hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour)
+        let ampm = hour >= 12 ? "PM" : "AM"
+        
+        if let minute = closeTime.minute, minute > 0 {
+            return "\(hour12):\(String(format: "%02d", minute)) \(ampm)"
+        } else {
+            return "\(hour12) \(ampm)"
         }
     }
 }
