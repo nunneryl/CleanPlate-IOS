@@ -181,6 +181,10 @@ class APIService {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "APIService")
     static var shared = APIService()
 
+    /// Called when a 401 is received on an authenticated request.
+    /// Should attempt to refresh the token and return the new token, or nil on failure.
+    var onTokenExpired: (@Sendable () async -> String?)?
+
     // Custom URLSession with SSL pinning
     private let sslPinningDelegate = SSLPinningDelegate()
     private lazy var session: URLSession = {
@@ -331,7 +335,7 @@ class APIService {
     }
 
 
-    private func performRequest<T: Decodable>(request: URLRequest) async throws -> T {
+    private func performRequest<T: Decodable>(request: URLRequest, isRetry: Bool = false) async throws -> T {
         let data: Data
         let response: URLResponse
 
@@ -350,6 +354,19 @@ class APIService {
         }
 
         guard let httpResponse = response as? HTTPURLResponse else { throw APIError.unknown }
+
+        // Intercept 401 on authenticated requests: refresh the token and retry once
+        if httpResponse.statusCode == 401, !isRetry,
+           request.value(forHTTPHeaderField: "Authorization") != nil,
+           let refresher = onTokenExpired {
+            logger.info("Received 401, attempting automatic token refresh...")
+            if let newToken = await refresher() {
+                var retryRequest = request
+                retryRequest.setValue("Bearer \(newToken)", forHTTPHeaderField: "Authorization")
+                return try await performRequest(request: retryRequest, isRetry: true)
+            }
+        }
+
         guard (200...299).contains(httpResponse.statusCode) else { throw APIError.serverError(httpResponse.statusCode) }
         if T.self == EmptyResponse.self { return EmptyResponse() as! T }
 

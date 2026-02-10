@@ -9,6 +9,12 @@ extension Notification.Name {
     static let didClearRecentSearches = Notification.Name("didClearRecentSearches")
 }
 
+enum AuthError: Error {
+    case missingToken
+    case notSignedIn
+    case refreshFailed
+}
+
 @MainActor
 class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
 
@@ -23,16 +29,23 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
 
     private var identityToken: String?
     private var postSignInAction: (() -> Void)?
+    private var refreshContinuation: CheckedContinuation<String, Error>?
+    private var activeRefreshTask: Task<String?, Never>?
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "AuthenticationManager")
-    
+
     override init() {
         super.init()
+
+        // Wire up automatic token refresh for 401 recovery
+        APIService.shared.onTokenExpired = { [weak self] in
+            await self?.refreshToken()
+        }
+
         if let userID = KeychainHelper.getUserID(), let token = KeychainHelper.getToken() {
             self.authState = .signedIn(userID: userID)
             self.identityToken = token
             AuthTokenProvider.token = token
             Task {
-                // Now fetches both when the app starts
                 await fetchFavorites()
                 await fetchRecentSearches()
             }
@@ -82,8 +95,88 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
     }
     
     
+    // MARK: - Token Refresh
+
+    /// Silently refreshes the Apple identity token when it expires.
+    /// Coalesces concurrent refresh attempts into a single operation.
+    func refreshToken() async -> String? {
+        // If a refresh is already in progress, wait for its result
+        if let existingTask = activeRefreshTask {
+            return await existingTask.value
+        }
+
+        guard case .signedIn(let userID) = authState else { return nil }
+
+        let task = Task<String?, Never> {
+            defer { activeRefreshTask = nil }
+
+            // Verify Apple credential is still authorized
+            do {
+                let state = try await ASAuthorizationAppleIDProvider().credentialState(forUserID: userID)
+                guard state == .authorized else {
+                    logger.warning("Apple credential revoked, signing out")
+                    signOut()
+                    return nil
+                }
+            } catch {
+                logger.error("Credential state check failed: \(error.localizedDescription)")
+                return nil
+            }
+
+            // Request a fresh identity token from Apple
+            do {
+                let newToken = try await performSilentTokenRefresh()
+
+                self.identityToken = newToken
+                AuthTokenProvider.token = newToken
+                try KeychainHelper.save(token: newToken)
+
+                // Re-authenticate with backend (best-effort, don't block on failure)
+                do {
+                    try await APIService.shared.createUser(identityToken: newToken)
+                } catch {
+                    logger.warning("Backend re-auth during refresh: \(error.localizedDescription)")
+                }
+
+                logger.info("Apple identity token refreshed successfully")
+                return newToken
+            } catch {
+                logger.error("Token refresh failed: \(error.localizedDescription)")
+                return nil
+            }
+        }
+
+        activeRefreshTask = task
+        return await task.value
+    }
+
+    /// Checks whether the Apple credential is still valid. Signs out if revoked.
+    func checkCredentialState() async {
+        guard case .signedIn(let userID) = authState else { return }
+        do {
+            let state = try await ASAuthorizationAppleIDProvider().credentialState(forUserID: userID)
+            if state != .authorized {
+                logger.warning("Apple credential no longer valid on foreground check, signing out")
+                signOut()
+            }
+        } catch {
+            logger.error("Foreground credential state check failed: \(error.localizedDescription)")
+        }
+    }
+
+    private func performSilentTokenRefresh() async throws -> String {
+        try await withCheckedThrowingContinuation { continuation in
+            self.refreshContinuation = continuation
+            let request = ASAuthorizationAppleIDProvider().createRequest()
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+            controller.performRequests()
+        }
+    }
+
     // MARK: - User Data Management
-    
+
     func fetchFavorites() async {
         guard let token = self.identityToken else { return }
         do {
@@ -166,41 +259,63 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let identityTokenData = appleIDCredential.identityToken,
               let identityToken = String(data: identityTokenData, encoding: .utf8) else {
+
+            // If this was a token refresh attempt, resume the continuation with an error
+            if let continuation = refreshContinuation {
+                refreshContinuation = nil
+                continuation.resume(throwing: AuthError.missingToken)
+                return
+            }
+
             logger.error("Missing or invalid identity token.")
             postSignInAction = nil
             return
         }
-        
+
+        // Handle token refresh flow
+        if let continuation = refreshContinuation {
+            refreshContinuation = nil
+            continuation.resume(returning: identityToken)
+            return
+        }
+
+        // Handle normal sign-in flow
         let userID = appleIDCredential.user
-        
+
         Task {
             do {
                 try await APIService.shared.createUser(identityToken: identityToken)
                 logger.info("Successfully created user on our backend.")
-                
+
                 try KeychainHelper.save(userID: userID)
                 try KeychainHelper.save(token: identityToken)
-                
+
                 self.identityToken = identityToken
                 AuthTokenProvider.token = identityToken
-                
+
                 self.authState = .signedIn(userID: userID)
-                
-                // Now fetches both after a new sign-in
+
                 await self.fetchFavorites()
                 await self.fetchRecentSearches()
-                
+
                 self.postSignInAction?()
                 self.postSignInAction = nil
-                
+
             } catch {
                 logger.error("Error during sign in process: \(error.localizedDescription, privacy: .public)")
                 self.postSignInAction = nil
             }
         }
     }
-    
+
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        // If this was a token refresh attempt, resume the continuation with the error
+        if let continuation = refreshContinuation {
+            refreshContinuation = nil
+            continuation.resume(throwing: error)
+            return
+        }
+
         logger.error("Sign in with Apple failed: \(error.localizedDescription, privacy: .public)")
     }
     

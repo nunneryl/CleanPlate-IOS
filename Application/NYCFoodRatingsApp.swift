@@ -8,6 +8,7 @@ import FirebaseCore
 struct NYCFoodRatingsApp: App {
 
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CleanPlate", category: "App")
+    @Environment(\.scenePhase) private var scenePhase
 
     #if SCREENSHOTS
     @StateObject private var authManager = MockAuthenticationManager()
@@ -28,8 +29,14 @@ struct NYCFoodRatingsApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
-                // --- MODIFIED: Explicitly cast the object to the expected type ---
                 .environmentObject(authManager as AuthenticationManager)
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        Task {
+                            await authManager.checkCredentialState()
+                        }
+                    }
+                }
         }
     }
 }
