@@ -28,6 +28,18 @@ class RestaurantDetailViewModel: ObservableObject {
     /// Whether Apple Maps search was verified against NYC coordinates
     @Published var isAppleMapVerified: Bool = false
 
+    /// Describes the outcome of the Apple Maps search for user-facing feedback
+    enum MapSearchStatus {
+        case idle
+        case loading
+        case verified
+        case unverified
+        case appleNotFound
+        case noCoordinates
+    }
+
+    @Published var mapSearchStatus: MapSearchStatus = .idle
+
     // MARK: - Private Properties
 
     private let mapService = MapService()
@@ -49,6 +61,7 @@ class RestaurantDetailViewModel: ObservableObject {
         guard let restaurant = try? state.getRestaurant() else { return }
 
         self.isLoadingMap = true
+        self.mapSearchStatus = .loading
 
         // Step 1: Get NYC coordinates (primary source of truth)
         let nycCoordinate = mapService.coordinateFromDatabase(
@@ -60,6 +73,7 @@ class RestaurantDetailViewModel: ObservableObject {
 
         // Step 2: Try to find Apple Maps Place Card for richer experience
         guard let name = restaurant.dba, !name.isEmpty else {
+            self.mapSearchStatus = nycCoordinate == nil ? .noCoordinates : .appleNotFound
             self.isLoadingMap = false
             return
         }
@@ -74,18 +88,21 @@ class RestaurantDetailViewModel: ObservableObject {
         case .verified(let mapItem):
             self.appleMapItem = mapItem
             self.isAppleMapVerified = true
+            self.mapSearchStatus = .verified
             logger.info("Apple Maps: Verified match for '\(name)'")
 
         case .unverified(let mapItem, let distance):
             // Use NYC coordinates but keep the MKMapItem for place card
             self.appleMapItem = mapItem
             self.isAppleMapVerified = false
+            self.mapSearchStatus = .unverified
             logger.warning("Apple Maps: Unverified (\(Int(distance))m away) for '\(name)'")
 
         case .unverifiedNoReference(let mapItem):
             // No NYC coords to compare, use Apple's result
             self.appleMapItem = mapItem
             self.isAppleMapVerified = false
+            self.mapSearchStatus = .unverified
             // Also use Apple's coordinate for display if we don't have NYC coords
             if self.displayCoordinate == nil {
                 self.displayCoordinate = mapItem.placemark.coordinate
@@ -95,6 +112,7 @@ class RestaurantDetailViewModel: ObservableObject {
             // Apple Maps search failed - we'll fall back to NYC coordinates
             self.appleMapItem = nil
             self.isAppleMapVerified = false
+            self.mapSearchStatus = nycCoordinate == nil ? .noCoordinates : .appleNotFound
             logger.info("Apple Maps search failed for '\(name)' - using NYC coordinates")
         }
 
