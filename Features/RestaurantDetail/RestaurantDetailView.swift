@@ -275,18 +275,28 @@ struct RestaurantContentView: View {
                     VStack(spacing: 0) {
                         MapSnapshotView(coordinate: coordinate)
                             .frame(height: 200)
-                        
+
                         Button(action: { handleAppleMapsLink() }) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "apple.logo").font(.title3)
-                                Text("View on Apple Maps").font(.system(size: 15, weight: .semibold, design: .rounded))
-                                Spacer()
-                                Image(systemName: "arrow.up.forward.app.fill").foregroundColor(Color(uiColor: .tertiaryLabel))
+                            VStack(spacing: 0) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "apple.logo").font(.title3)
+                                    Text("View on Apple Maps").font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    Spacer()
+                                    Image(systemName: "arrow.up.forward.app.fill").foregroundColor(Color(uiColor: .tertiaryLabel))
+                                }
+                                if viewModel.mapSearchStatus == .unverified {
+                                    Text("Location may be approximate")
+                                        .font(.system(size: 12, design: .rounded))
+                                        .foregroundColor(.orange)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.top, 4)
+                                        .padding(.leading, 36)
+                                }
                             }
                             .padding().background(Color(uiColor: .secondarySystemGroupedBackground))
                         }
                         .foregroundColor(.primary)
-                        
+
                         Button(action: { handleGoogleLink() }) {
                             HStack(spacing: 12) {
                                 Image("logo_google").resizable().aspectRatio(contentMode: .fit).frame(width: 24, height: 24)
@@ -302,13 +312,26 @@ struct RestaurantContentView: View {
                     .padding(.horizontal)
                     .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
                 } else {
-                    VStack {
+                    // No coordinates available — still offer Google Maps as fallback
+                    VStack(spacing: 12) {
                         Image(systemName: "mappin.slash.circle")
                             .font(.title)
                             .foregroundColor(.secondary)
-                        Text("Map Not Available")
+                        Text("Apple Maps location not available")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
+
+                        Button(action: { handleGoogleLink() }) {
+                            HStack(spacing: 8) {
+                                Image("logo_google").resizable().aspectRatio(contentMode: .fit).frame(width: 20, height: 20)
+                                Text("Try Google Maps").font(.system(size: 15, weight: .semibold, design: .rounded))
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(Color(UIColor.systemGray6))
+                            .cornerRadius(8)
+                        }
+                        .foregroundColor(.primary)
                     }
                     .frame(height: 200)
                     .padding(.horizontal)
