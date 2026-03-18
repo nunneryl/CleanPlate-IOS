@@ -271,6 +271,18 @@ class APIService {
         let _: EmptyResponse = try await buildAndPerformRequest(path: "/recent-searches", method: "DELETE", token: token)
     }
 
+    // MARK: - Push Notifications
+
+    func registerPushToken(deviceToken: String, token: String) async throws {
+        let body: [String: Any] = ["device_token": deviceToken]
+        let _: EmptyResponse = try await buildAndPerformRequest(path: "/push-tokens", method: "POST", body: body, token: token)
+    }
+
+    func unregisterPushToken(deviceToken: String, token: String) async throws {
+        let body: [String: Any] = ["device_token": deviceToken]
+        let _: EmptyResponse = try await buildAndPerformRequest(path: "/push-tokens", method: "DELETE", body: body, token: token)
+    }
+
     // MARK: - Private Helper Functions
 
     private func buildAndPerformRequest<T: Decodable>(path: String, method: String = "GET", queryItems: [URLQueryItem]? = nil, body: [String: Any]? = nil, token: String? = nil) async throws -> T {

@@ -2,13 +2,15 @@
 
 import SwiftUI
 import AuthenticationServices
+import UserNotifications
 
 struct ProfileView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @Environment(\.colorScheme) var colorScheme
-    
+    @ObservedObject private var pushManager = PushNotificationManager.shared
+
     @State private var isShowingDeleteAlert = false
-    
+
     var body: some View {
         NavigationView {
             VStack {
@@ -23,11 +25,11 @@ struct ProfileView: View {
         }
         .navigationViewStyle(.stack)
     }
-    
+
     private var signedOutView: some View {
         VStack {
             Spacer()
-            
+
             Text("Create an account to save your favorite restaurants.")
                 .font(.headline)
                 .multilineTextAlignment(.center)
@@ -39,16 +41,16 @@ struct ProfileView: View {
                 .frame(height: 55)
                 .cornerRadius(10)
                 .padding()
-            
+
             Spacer()
         }
     }
-    
+
     private func signedInView(userID: String) -> some View {
         let favoritedRestaurants = authManager.favorites.values.sorted {
             ($0.dba ?? "") < ($1.dba ?? "")
         }
-        
+
         return List {
             // FAVORITES SECTION
             Section(header: Text("My Favorites (\(favoritedRestaurants.count))")) {
@@ -64,7 +66,7 @@ struct ProfileView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 44, height: 44)
-                                
+
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(restaurant.dba ?? "Unknown Restaurant")
                                         .font(.headline)
@@ -83,17 +85,70 @@ struct ProfileView: View {
                     }
                 }
             }
-            
+
+            // NOTIFICATIONS SECTION
+            Section(header: Text("Notifications")) {
+                if pushManager.notificationStatus == .authorized {
+                    HStack {
+                        Image(systemName: "bell.fill")
+                            .foregroundColor(.green)
+                        Text("Push notifications enabled")
+                        Spacer()
+                        Text("On")
+                            .foregroundColor(.secondary)
+                    }
+                    Text("You'll be notified about grade changes, new violations, and reopenings for your favorite restaurants.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if pushManager.notificationStatus == .denied {
+                    HStack {
+                        Image(systemName: "bell.slash")
+                            .foregroundColor(.secondary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Notifications disabled")
+                            Text("Enable in Settings to get updates on your favorites.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button("Settings") {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        }
+                        .font(.subheadline)
+                    }
+                } else {
+                    Button {
+                        Task {
+                            await pushManager.requestPermission()
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "bell.badge")
+                                .foregroundColor(.accentColor)
+                            Text("Enable push notifications")
+                        }
+                    }
+                    Text("Get notified about grade changes, violations, and reopenings for your favorites.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+
             // ACCOUNT ACTIONS SECTION
             Section {
                 Button("Sign Out", role: .destructive) {
                     authManager.signOut()
                 }
-                
+
                 Button("Delete Account", role: .destructive) {
                     isShowingDeleteAlert = true
                 }
             }
+        }
+        .onAppear {
+            Task { await pushManager.refreshAuthorizationStatus() }
         }
         .alert("Are you sure?", isPresented: $isShowingDeleteAlert) {
             Button("Delete", role: .destructive) {

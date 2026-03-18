@@ -13,6 +13,7 @@ struct NYCFoodRatingsApp: App {
     #if SCREENSHOTS
     @StateObject private var authManager = MockAuthenticationManager()
     #else
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var authManager = AuthenticationManager()
     #endif
 
@@ -35,6 +36,7 @@ struct NYCFoodRatingsApp: App {
                         Task {
                             await authManager.checkCredentialState()
                         }
+                        PushNotificationManager.shared.registerIfAuthorized()
                     }
                 }
         }
