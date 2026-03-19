@@ -31,7 +31,7 @@ struct NYCFoodRatingsApp: App {
         WindowGroup {
             MainTabView()
                 .environmentObject(authManager as AuthenticationManager)
-                .onChange(of: scenePhase) { _, newPhase in
+                .onChange(of: scenePhase) { newPhase in
                     if newPhase == .active {
                         Task {
                             await authManager.checkCredentialState()
