@@ -298,6 +298,9 @@ class AuthenticationManager: NSObject, ObservableObject, ASAuthorizationControll
                 await self.fetchFavorites()
                 await self.fetchRecentSearches()
 
+                // Register push token with backend now that user is authenticated
+                PushNotificationManager.shared.sendPendingTokenIfNeeded(authToken: identityToken)
+
                 self.postSignInAction?()
                 self.postSignInAction = nil
 

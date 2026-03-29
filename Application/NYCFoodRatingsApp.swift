@@ -13,6 +13,7 @@ struct NYCFoodRatingsApp: App {
     #if SCREENSHOTS
     @StateObject private var authManager = MockAuthenticationManager()
     #else
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var authManager = AuthenticationManager()
     #endif
 
@@ -30,11 +31,12 @@ struct NYCFoodRatingsApp: App {
         WindowGroup {
             MainTabView()
                 .environmentObject(authManager as AuthenticationManager)
-                .onChange(of: scenePhase) { _, newPhase in
+                .onChange(of: scenePhase) { newPhase in
                     if newPhase == .active {
                         Task {
                             await authManager.checkCredentialState()
                         }
+                        PushNotificationManager.shared.registerIfAuthorized()
                     }
                 }
         }

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		32F1A0012F09B00100A1B2C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F1A0002F09B00100A1B2C3 /* AppDelegate.swift */; };
+		32F1A0032F09B00100A1B2C3 /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F1A0022F09B00100A1B2C3 /* PushNotificationManager.swift */; };
 		3224FB2B2E283CAB00E924A9 /* AnalyticsLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */; };
 		323C1CC72E4A722700EB2E2A /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323C1CC62E4A722700EB2E2A /* ShareSheet.swift */; };
 		3268C7F72E6A271400C32153 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3268C7F62E6A271400C32153 /* Models.swift */; };
@@ -68,6 +70,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		32F1A0002F09B00100A1B2C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		32F1A0022F09B00100A1B2C3 /* PushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManager.swift; sourceTree = "<group>"; };
 		3224FB2A2E283CAB00E924A9 /* AnalyticsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsLogger.swift; sourceTree = "<group>"; };
 		323C1CC62E4A722700EB2E2A /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		3268C7F62E6A271400C32153 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -145,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				32C138BA2D8F66CF006F4121 /* NYCFoodRatingsApp.swift */,
+				32F1A0002F09B00100A1B2C3 /* AppDelegate.swift */,
 				32C138B82D8F66CF006F4121 /* MainTabView.swift */,
 			);
 			path = Application;
@@ -175,6 +180,7 @@
 			children = (
 				32A22CAA2E4BD8DD0077653F /* AuthenticationManager.swift */,
 				32C138C02D8F67E2006F4121 /* APIService.swift */,
+				32F1A0022F09B00100A1B2C3 /* PushNotificationManager.swift */,
 				3268C7FD2E708C4400C32153 /* MapServices.swift */,
 				32B5597E2EF5AD5900627E94 /* Config.swift */,
 			);
@@ -463,6 +469,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32F1A0012F09B00100A1B2C3 /* AppDelegate.swift in Sources */,
+				32F1A0032F09B00100A1B2C3 /* PushNotificationManager.swift in Sources */,
 				32C138BB2D8F66CF006F4121 /* NYCFoodRatingsApp.swift in Sources */,
 				32FC37DF2E1A056200E72886 /* RecentlyGradedListViewModel.swift in Sources */,
 				32FC37E32E215C2A00E72886 /* RestaurantDetailViewModel.swift in Sources */,
